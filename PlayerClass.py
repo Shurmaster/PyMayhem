@@ -51,6 +51,50 @@ class Player:
             return False
         self.ChangeHP(-d, target)
         return True
+    def HealingT(self, h): #Restores {h} points of life to self.
+                           #(Without going over Player.MaxHP)
+        self.ChangeHP(h, self)
+    def GetAction(self, a): #Increase actions this turn by {a}.
+        self.Actions+=a
+    def getShield(self, n): #Adds a shield of {n}.
+        self.Shield.append(n)
+    
+    def Whirlwind(self):
+        return 0
+        #Inflicts n damage to all opponents and restore n points of HP
+        #Where n is the number of players
+    def BattleRoar(self):
+        return 0
+        #All players discard their hand and draw 3 cards
+    def DestroyShield(self):
+        return 0
+        #Destroy a Shield x from Player t.
+    def DestroyAllShield(self):
+        return 0
+        #Calls DestroyShield for all players.
+    def Fireball(self):
+        return 0
+        #Inflicts 3 damage to all players
+    def StealShield(self):
+        return 0
+        #Take shield "s" from Player t and append it as your own.
+    def SwapHP(self):
+        return 0
+        #Exchange HP with Player t.
+    def DivInsp(self):
+        return 0
+        #Adds a card in your Discard Pile to your hand
+    def Disguise(self):
+        return 0
+        #None of your opponent's cards affect you or your shields until your next turn.
+    def PickPocket(self):
+        return 0
+        #Draw the top card of Player t's Deck   
+    
+###################################################################
+#   Alternative Functions
+#   Basically other versions of above functions
+#   In different scenarios, if needed.
     def AttackSh(self, target, d, st):
         target.Shield[st] -= d
         if target.Shield[st] == 0:
@@ -59,17 +103,7 @@ class Player:
         if target.Shield[st] < 0:
             return target.Shield.pop(st) * -1
         else:
-            return 0
-
-    def HealingT(self, h): #Restores {h} points of life to self.
-                           #(Without going over Player.MaxHP)
-        self.ChangeHP(h, self)
-
-    def GetAction(self, a): #Increase actions this turn by {a}.
-        self.Actions+=a
-    def getShield(self, n): #Adds a shield of {n}.
-        self.Shield.append(n)
-    
+            return 0    
 ####################################################################
 #   Helper Functions
 #   Since so many actions will be repeated in one way or another with each effect
@@ -77,13 +111,21 @@ class Player:
 #   In multiple pieces with the goal to avoid repetition in code writing.
 
     def Deck2Hand(self, card = 0): 
-        self.Hand.append(self.Deck.pop(card))
+        myCard = self.Deck.pop(card)
+        self.Hand.append(myCard)
+        return myCard
     def Hand2GY(self, card = 0):  
-        self.GY.append(self.Hand.pop(card))
+        myCard = self.Hand.pop(card)
+        self.GY.append(myCard)
+        return myCard
     def Deck2GY(self, card= 0):
-        self.GY.append(self.Deck.pop(card))
+        myCard = self.Deck.pop(card)
+        self.GY.append(myCard)
+        return myCard
     def GY2Deck(self, card= 0):
-        self.Deck.append(self.GY.pop(card))
+        myCard = self.GY.pop(card)
+        self.Deck.append(myCard)
+        return myCard
     def ChangeHP(self, n, target):
         target.HP += n
         if (target.HP > target.MHP):

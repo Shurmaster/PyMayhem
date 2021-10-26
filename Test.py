@@ -9,8 +9,8 @@ def UseCard(ply, n):
 
 
 if __name__ == "__main__":
-    P1 = Player("Aldo", 2)
-    P2 = Player("Not Aldo", 1)
+    P1 = Player("Hero", 2)
+    P2 = Player("Rival", 1)
     inGame = True
     myL = (P1, P2)
     ind = 0
@@ -40,26 +40,32 @@ if __name__ == "__main__":
                 print("Player {} used {} whichs deals {} Damage, Draws {} cards, Adds {} Armor, gives {} extra actions and Heals {} points.".format(turnP.player, myUsed, myUsed.damage, myUsed.draw, myUsed.defense, myUsed.action, myUsed.healing))
                 if len(turnP.Hand) == 0:
                     turnP.DrawCard(2)
-                    print("     empty Hand; Drawing 2 cards")
-                    print("         Hand({}): {}".format(len(turnP.Hand), turnP.myHand()))
+                    print("*     empty Hand; Drawing 2 cards")
+                    print("*         Hand({}): {}".format(len(turnP.Hand), turnP.myHand()))
                 myAttack = myUsed.damage
-                while len(Ptarget.Shield) > 0:
-                    myTargeto = random.randint(0, len(Ptarget.Shield)) - 1
-                    print("     Opponent {}'s Shield: {}".format(Ptarget.player, Ptarget.Shield))
-                    myAttack = turnP.AttackSh(Ptarget, myAttack, myTargeto)
-                    print("     Damage remaining: {}".format(myAttack))
-                    print("     Opponent {}'s Shield: {}".format(Ptarget.player, Ptarget.Shield))
-                    if myAttack <= 0:
-                        myAttack = 0
-                        break
-                turnP.AttackOP(Ptarget, myAttack)
-
-                turnP.HealingT(myUsed.healing)
-                turnP.DrawCard(myUsed.draw)
+                if len(Ptarget.Shield) > 0 and myAttack > 0:
+                    while len(Ptarget.Shield) > 0:
+                        myTargeto = random.randint(0, len(Ptarget.Shield)) - 1
+                        print("*     Opponent {}'s Shield(Before Combat): {}".format(Ptarget.player, Ptarget.Shield))
+                        myAttack = turnP.AttackSh(Ptarget, myAttack, myTargeto)
+                        print("+         Opponent {}'s Shield(After Combat): {}".format(Ptarget.player, Ptarget.Shield))
+                        if myAttack <= 0:
+                            myAttack = 0
+                            break
+                        print("*         Damage remaining: {}".format(myAttack))
+                if myAttack > 0:
+                    turnP.AttackOP(Ptarget, myAttack)
+                    print("+    {}'s HP: {}".format(Ptarget.player, Ptarget.HP))
+                if myUsed.healing > 0:
+                    turnP.HealingT(myUsed.healing)
+                    print("+    Player {}'s HP: {}".format(turnP.player, turnP.HP))
+                if myUsed.draw > 0:
+                    turnP.DrawCard(myUsed.draw)
+                    print("+    Hand({}): {}".format(len(turnP.Hand), turnP.myHand()))
                 turnP.GetAction(myUsed.action)
                 if myUsed.defense > 0:
                     turnP.getShield(myUsed.defense)
-                    print("{}'s Shield: {}".format(turnP.player, turnP.Shield))
+                    print("+    {}'s Shield: {}".format(turnP.player, turnP.Shield))
                 turnP.Actions -=1
                 if Ptarget.HP <= 0 or turnP.HP <= 0:
                     inGame = False
