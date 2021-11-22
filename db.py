@@ -6,13 +6,13 @@ if __name__ == "__main__":
     con = sqlite3.connect('cards.db')
     with con:
         cur = con.cursor()
-        
+
         # check if cards table already exists, and drop it if so
         cur.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='cards' ''')
         if cur.fetchone()[0]:
             cur.execute("DROP TABLE cards")
             print("Dropped table cards.")
-        
+
         # create cards table
         sql = '''CREATE TABLE cards (
             quantity   INT NOT NULL,
