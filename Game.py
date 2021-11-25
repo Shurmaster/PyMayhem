@@ -33,6 +33,10 @@ class Game:
         self.gameRunning = True
         self.gameState = 'start'
         self.selectedCard = ['', pg.K_0]
+        # info for each player
+        self.P1 = Player("Player 1", "yellow") # deck ID 1 will be yellow
+        self.P2 = Player("Player 2", "yellow")
+        self.myL = (P1, P2)
 
         # info for each player
         self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
