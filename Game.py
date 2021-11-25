@@ -5,7 +5,20 @@ from PlayerClass import *
 
 pg.init()
 
+# to help in loading large numbers of images
+# def load_images(self, my_path):
+#     # make a dictionary with keys as image names and values as loaded load_images
+#     image_dict = {}
+#     for dirpath, dirnames, filenames in os.walk(my_path):
+#         for filename in filenames:
+#             if filename.endswith('.png'):
+#                 key = filename[:-4]
+#                 img = pygame.image.load(os.path.join(dirpath, filename)).convert()
+#                 image_dict[key] = img
+#     return image_dict
+
 bg = pg.image.load("images/start_saver_600x600.jpg")
+# images = load_images("images")
 
 ## Can have a separate file for globals if we want
 SCREENWIDTH = 1200
@@ -30,9 +43,9 @@ class Game:
 
     # starting up the screen
     def start(self):
+        self.setup() # run setup only once
         while self.gameRunning:
             if self.gameState == 'start':
-                self.setup() # run setup only when at start screen
                 self.start_events()
                 self.start_draw()
             elif self.gameState == 'select card':
@@ -72,6 +85,9 @@ class Game:
         for i in self.myL:
             i.DrawCard(3)
 
+        print("Length of p1 hand: {}".format(len(self.P1.Hand)))
+        print("Length of p2 hand: {}".format(len(self.P2.Hand)))
+
     ######### GENERAL HELPER FUNCTIONS ###########
     def draw_text(self, text, screen, pos, size, color, fontname, wantCentered = False):
         font = pg.font.SysFont(fontname, size)
@@ -83,6 +99,7 @@ class Game:
             pos[1] = pos[1] - msg_sz[1] // 2 # this is to make our text centered on the screen
 
         screen.blit(message, pos)
+
 
     ###################################### START SCREEN HELPER FUNCTIONS ######################################
     def start_events(self):
@@ -147,10 +164,16 @@ class Game:
             # TODO: if card has shield, draw shield
             pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
 
-        # TODO: for cards in players hand
-        for i in range(0, 6):
-            # TODO: if card has shield, draw shield
-            pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 250))
+        for i, j in enumerate(self.currentPlayer.Hand):
+            img = pg.image.load("images/{}/{}.jpg".format(j.color, j.id)).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
+
+        # # TODO: for cards in players hand
+        # for i in range(0, 6):
+        #     # TODO: if card has shield, draw shield
+        #     pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 250))
 
         pg.display.update()
 
