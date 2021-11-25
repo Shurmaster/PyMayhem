@@ -32,6 +32,9 @@ class Game:
             elif self.gameState == 'confirm card':
                 self.confirm_card_events()
                 self.confirm_card_draw()
+            elif self.gameState == 'select opp card':
+                self.select_opp_events()
+                self.select_opp_draw()
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
@@ -106,14 +109,22 @@ class Game:
     def card_select_draw(self):
         self.screen.fill(pg.Color("white"))
 
-        # this will be "for cards in hand" later
+        # TODO: for cards in opponent's hand
         for i in range(0, 6):
-            pg.draw.rect(self.screen, "black", pg.Rect(100+(170*i), 400, 150, 200))
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # TODO: for cards in players hand
+        for i in range(0, 6):
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 250))
+
         pg.display.update()
 
 
-    def confirm_card_events(self): # here is where we can have the keybinds and things for the actual gameplay
-        for event in pg.event.get(): # like X is to play a card or whatever
+    def confirm_card_events(self):
+        # change your card selection or confirm it with ENTER
+        for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
@@ -122,6 +133,8 @@ class Game:
                 self.selectedCard[0] = pg.key.name(event.key)
                 self.selectedCard[1] = event.key
                 self.gameState = 'confirm card'
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                pass
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -129,9 +142,15 @@ class Game:
     def confirm_card_draw(self):
         self.screen.fill(pg.Color("white"))
 
-        # this will be "for cards in hand" later
+        # TODO: for cards in opponent's handl
         for i in range(0, 6):
-            pg.draw.rect(self.screen, "black", pg.Rect(100+(170*i), 400, 150, 200))
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # TODO: for cards in player's hand
+        for i in range(0, 6):
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 250))
 
         self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
