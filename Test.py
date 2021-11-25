@@ -1,6 +1,7 @@
 from PlayerClass import Player
 from CardClass import Card
 import random
+import sqlite3
 
 def UseCard(ply, n):
     toRet = ply.Hand[n ]

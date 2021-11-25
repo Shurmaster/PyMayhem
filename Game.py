@@ -14,11 +14,13 @@ SCREENHEIGHT = 600
 class Game:
     def __init__(self):
         self.screen = pg.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-        #self.player1 = Player()
-        #self.player2 = Player()
         self.gameRunning = True
         self.gameState = 'start'
         self.selectedCard = ['', pg.K_0]
+        # info for each player
+        self.P1 = Player("Player 1", "yellow") # deck ID 1 will be yellow
+        self.P2 = Player("Player 2", "yellow")
+        self.myL = (P1, P2)
 
     # starting up the screen
     def start(self):
@@ -38,6 +40,16 @@ class Game:
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
+
+    ######### GAME SETUP AND HANDLING ###########
+    def setup(self):
+        # add cards to each player's deck
+        db = sqlite3.connect('cards.db')
+        db.row_factory = sqlite3.Row
+        c = db.cursor()
+
+        for i in myL:
+            for n in range(0,27):
 
     ######### GENERAL HELPER FUNCTIONS ###########
     def draw_text(self, text, screen, pos, size, color, fontname, wantCentered = False):
