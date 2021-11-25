@@ -1,4 +1,5 @@
 import pygame as pg
+import sqlite3
 from CardClass import *
 from PlayerClass import *
 
@@ -17,15 +18,21 @@ class Game:
         self.gameRunning = True
         self.gameState = 'start'
         self.selectedCard = ['', pg.K_0]
+
         # info for each player
         self.P1 = Player("Player 1", "yellow") # deck ID 1 will be yellow
         self.P2 = Player("Player 2", "yellow")
-        self.myL = (P1, P2)
+        self.myL = (self.P1, self.P2)
+
+        # info pertaining to the game
+        self.turn = 1
+        self.currentPlayer = self.P1 # switches during hot seat
 
     # starting up the screen
     def start(self):
         while self.gameRunning:
             if self.gameState == 'start':
+                self.setup() # run setup only when at start screen
                 self.start_events()
                 self.start_draw()
             elif self.gameState == 'select card':
@@ -44,12 +51,26 @@ class Game:
     ######### GAME SETUP AND HANDLING ###########
     def setup(self):
         # add cards to each player's deck
+
+        # connect to database first
         db = sqlite3.connect('cards.db')
         db.row_factory = sqlite3.Row
         c = db.cursor()
 
-        for i in myL:
-            for n in range(0,27):
+        # now populating each player's deck
+        for i in self.myL:
+            # get all cards in database that belong to the deck of the current player
+            for row in c.execute("SELECT * FROM Cards WHERE deck = '{}'".format(i.deckID)).fetchall():
+                row = dict(row)
+                n = int(row.pop('quantity')) # this is so we can add the right quantity of each card type to the player's deck
+                for x in range(n): # name   desk       color        id         damage         draw         heal         armor
+                    toAdd = Card(row['id'], row['id'], row['deck'], row['id'], row['damage'], row['draw'], row['heal'], row['armor'])
+                    # for now extraABC and powerABC are left out, since they aren't in cards.csv yet
+                    i.Deck.append(toAdd)
+
+        # adds 3 cards to each player's hand
+        for i in self.myL:
+            i.DrawCard(3)
 
     ######### GENERAL HELPER FUNCTIONS ###########
     def draw_text(self, text, screen, pos, size, color, fontname, wantCentered = False):
