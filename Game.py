@@ -57,7 +57,6 @@ class Game:
         self.setup() # run setup only once
         while self.gameRunning:
             if self.gameState == 'start':
-                self.setup() # run setup only when at start screen
                 self.start_events()
                 self.start_draw()
             elif self.gameState == 'select card':
