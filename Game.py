@@ -33,10 +33,15 @@ class Game:
         self.gameRunning = True
         self.gameState = 'start'
         self.selectedCard = ['', pg.K_0]
+
         # info for each player
         self.P1 = Player("Player 1", "yellow") # deck ID 1 will be yellow
         self.P2 = Player("Player 2", "yellow")
-        self.myL = (P1, P2)
+        self.myL = (self.P1, self.P2)
+
+        # info pertaining to the game
+        self.turn = 1
+        self.currentPlayer = self.P1 # switches during hot seat
 
         # info for each player
         self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
@@ -52,6 +57,7 @@ class Game:
         self.setup() # run setup only once
         while self.gameRunning:
             if self.gameState == 'start':
+                self.setup() # run setup only when at start screen
                 self.start_events()
                 self.start_draw()
             elif self.gameState == 'select card':
