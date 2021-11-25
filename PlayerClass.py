@@ -43,8 +43,8 @@ class Player:
 #                   are made specifically to each player. Subject to changes.)
     def DrawCard(self, num=1):
         for i in range(0, num):
-            if len(self.Deck) == 0:
-                print("     There are 0 cards in deck; Shuffling")
+            if len(self.Hand) == 0:
+                print("     There are 0 cards in hand; Shuffling")
                 self.returnDeck()
             self.Deck2Hand() #
     def AttackOP(self, target, d): #Inflict {d} damage to Player {target}.

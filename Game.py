@@ -1,5 +1,6 @@
 import pygame as pg
 import sqlite3
+import random
 from CardClass import *
 from PlayerClass import *
 
@@ -146,12 +147,13 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
-            if event.type == pg.KEYDOWN and (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
-                print ("you selected key {}\n".format(pg.key.name(event.key)))
-                # hold the selected key in this list for reference in the next scene
-                self.selectedCard[0] = pg.key.name(event.key)
-                self.selectedCard[1] = event.key
-                self.gameState = 'confirm card'
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+                if int(pg.key.name(event.key)) in range(1, len(self.currentPlayer.Hand)+1):
+                    print ("you selected key {}\n".format(pg.key.name(event.key)))
+                    # change the selected key
+                    self.selectedCard[0] = pg.key.name(event.key)
+                    self.selectedCard[1] = event.key
+                    self.gameState = 'confirm card'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -164,16 +166,12 @@ class Game:
             # TODO: if card has shield, draw shield
             pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
 
+        # TODO: if card has shield, draw shield
         for i, j in enumerate(self.currentPlayer.Hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.color, j.id)).convert()
             rect = img.get_rect()
             rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
-
-        # # TODO: for cards in players hand
-        # for i in range(0, 6):
-        #     # TODO: if card has shield, draw shield
-        #     pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 250))
 
         pg.display.update()
 
@@ -184,13 +182,14 @@ class Game:
             if event.type == pg.QUIT:
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
-                print ("you selected key {}\n".format(pg.key.name(event.key)))
-                # change the selected key
-                self.selectedCard[0] = pg.key.name(event.key)
-                self.selectedCard[1] = event.key
-                self.gameState = 'confirm card'
+                if int(pg.key.name(event.key)) in range(1, len(self.currentPlayer.Hand)+1):
+                    print ("you selected key {}\n".format(pg.key.name(event.key)))
+                    # change the selected key
+                    self.selectedCard[0] = pg.key.name(event.key)
+                    self.selectedCard[1] = event.key
+                    self.gameState = 'confirm card'
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-                pass
+                self.gameState = 'select opp card'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -203,15 +202,48 @@ class Game:
             # TODO: if card has shield, draw shield
             pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
 
-        # TODO: for cards in player's hand
-        for i in range(0, 6):
-            # TODO: if card has shield, draw shield
-            pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 250))
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.currentPlayer.Hand):
+            img = pg.image.load("images/{}/{}.jpg".format(j.color, j.id)).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
 
         self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
+    def select_opp_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def select_opp_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # TODO: for cards in opponent's handl
+        for i in range(0, 6):
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.currentPlayer.Hand):
+            img = pg.image.load("images/{}/{}.jpg".format(j.color, j.id)).convert()
+            rect = img.get_rect()
+
+            # this will help distinguish the card picked
+            if (i == int(self.selectedCard[0])-1):
+                rect.topleft = (100+(170*i),330)
+            else:
+                rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
+
+        #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Now it's time to select an opponent card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
 
 
 
