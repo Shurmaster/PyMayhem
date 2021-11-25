@@ -18,6 +18,7 @@ class Game:
         #self.player2 = Player()
         self.gameRunning = True
         self.gameState = 'start'
+        self.selectedCard = ['', pg.K_0]
 
     # starting up the screen
     def start(self):
@@ -25,9 +26,12 @@ class Game:
             if self.gameState == 'start':
                 self.start_events()
                 self.start_draw()
-            elif self.gameState == 'playing':
-                self.playing_events()
-                self.playing_draw()
+            elif self.gameState == 'select card':
+                self.card_select_events()
+                self.card_select_draw()
+            elif self.gameState == 'confirm card':
+                self.confirm_card_events()
+                self.confirm_card_draw()
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
@@ -50,7 +54,7 @@ class Game:
             if event.type == pg.QUIT: # if we press the "X" close it or else we have to force close
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE: # user presses space bar to start playing the game
-                self.gameState = 'playing'
+                self.gameState = 'select card'
             if event.type == pg.KEYDOWN and event.key == pg.K_TAB: # we'll have this to display options/help/about menu
                 self.gameState = 'help'
 
@@ -84,23 +88,55 @@ class Game:
         pg.display.update()
 
     ###################################### GAME PLAY HELPER FUNCTIONS #####################################
-    def playing_events(self): # here is where we can have the keybinds and things for the actual gameplay
-        for event in pg.event.get(): # like X is to play a card or whatever
+    # select the card from your hand you want to play
+    def card_select_events(self):
+        for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+                print ("you selected key {}\n".format(pg.key.name(event.key)))
+                # hold the selected key in this list for reference in the next scene
+                self.selectedCard[0] = pg.key.name(event.key)
+                self.selectedCard[1] = event.key
+                self.gameState = 'confirm card'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
 
-    def playing_draw(self):
+    def card_select_draw(self):
         self.screen.fill(pg.Color("white"))
-        # self.draw_text("This screen will be for the game", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//3], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        # self.draw_text("made it to the game!", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2.5], 24, pg.Color("white"), pg.font.get_default_font(), True)
 
-
+        # this will be "for cards in hand" later
         for i in range(0, 6):
             pg.draw.rect(self.screen, "black", pg.Rect(100+(170*i), 400, 150, 200))
         pg.display.update()
+
+
+    def confirm_card_events(self): # here is where we can have the keybinds and things for the actual gameplay
+        for event in pg.event.get(): # like X is to play a card or whatever
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+                print ("you selected key {}\n".format(pg.key.name(event.key)))
+                # change the selected key
+                self.selectedCard[0] = pg.key.name(event.key)
+                self.selectedCard[1] = event.key
+                self.gameState = 'confirm card'
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def confirm_card_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # this will be "for cards in hand" later
+        for i in range(0, 6):
+            pg.draw.rect(self.screen, "black", pg.Rect(100+(170*i), 400, 150, 200))
+
+        self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
+
 
 
 
