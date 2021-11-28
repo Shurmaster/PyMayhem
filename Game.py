@@ -1,36 +1,76 @@
+
 import pygame as pg
-from CardClass import *
-from PlayerClass import *
+import sqlite3
+import random
+from Card import *
+from Player import *
 
 pg.init()
 
+# to help in loading large numbers of images
+# def load_images(self, my_path):
+#     # make a dictionary with keys as image names and values as loaded load_images
+#     image_dict = {}
+#     for dirpath, dirnames, filenames in os.walk(my_path):
+#         for filename in filenames:
+#             if filename.endswith('.png'):
+#                 key = filename[:-4]
+#                 img = pygame.image.load(os.path.join(dirpath, filename)).convert()
+#                 image_dict[key] = img
+#     return image_dict
+
 bg = pg.image.load("images/start_saver_600x600.jpg")
+# images = load_images("images")
 
 ## Can have a separate file for globals if we want
-SCREENWIDTH = 600
+SCREENWIDTH = 1200
 SCREENHEIGHT = 600
 
 
 class Game:
     def __init__(self):
         self.screen = pg.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
-        #self.player1 = Player()
-        #self.player2 = Player()
         self.gameRunning = True
         self.gameState = 'start'
-    
+        self.selectedCard = ['', pg.K_0]
+
+        # info for each player
+        self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
+        self.P2 = YellowPlayer("Player 2",)
+        self.myL = (self.P1, self.P2)
+
+        # info pertaining to the game
+        self.turn = 1
+        self.currentPlayer = self.P1 # switches during hot seat
+
     # starting up the screen
     def start(self):
+        self.setup() # run setup only once
         while self.gameRunning:
             if self.gameState == 'start':
                 self.start_events()
                 self.start_draw()
-            elif self.gameState == 'playing':
-                self.playing_events()
-                self.playing_draw()
+            elif self.gameState == 'select card':
+                self.card_select_events()
+                self.card_select_draw()
+            elif self.gameState == 'confirm card':
+                self.confirm_card_events()
+                self.confirm_card_draw()
+            elif self.gameState == 'select opp card':
+                self.select_opp_events()
+                self.select_opp_draw()
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
+
+    ######### GAME SETUP AND HANDLING ###########
+    def setup(self):
+        # add cards to each player's deck
+
+        # connect to database first
+        db = sqlite3.connect('cards.db')
+        db.row_factory = sqlite3.Row
+        c = db.cursor()
 
     ######### GENERAL HELPER FUNCTIONS ###########
     def draw_text(self, text, screen, pos, size, color, fontname, wantCentered = False):
@@ -44,16 +84,17 @@ class Game:
 
         screen.blit(message, pos)
 
+
     ###################################### START SCREEN HELPER FUNCTIONS ######################################
     def start_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT: # if we press the "X" close it or else we have to force close
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE: # user presses space bar to start playing the game
-                self.gameState = 'playing'
+                self.gameState = 'select card'
             if event.type == pg.KEYDOWN and event.key == pg.K_TAB: # we'll have this to display options/help/about menu
                 self.gameState = 'help'
-    
+
     def start_draw(self):
         self.screen.blit(bg, (0, 0))
         self.draw_text('Dungeon Mayhem', self.screen, [SCREENWIDTH//2, SCREENHEIGHT//3], 32, pg.Color("white"), pg.font.get_default_font(), True)
@@ -82,20 +123,109 @@ class Game:
         self.draw_text("Placeholder", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.4], 24, pg.Color("white"), pg.font.get_default_font(), True)
         self.draw_text("Press SPACE to go back or Press ESCAPE to quit", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.2], 24, pg.Color("white"), pg.font.get_default_font(), True)
         pg.display.update()
-    
+
     ###################################### GAME PLAY HELPER FUNCTIONS #####################################
-    def playing_events(self): # here is where we can have the keybinds and things for the actual gameplay
-        for event in pg.event.get(): # like X is to play a card or whatever
+    # select the card from your hand you want to play
+    def card_select_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+                if int(pg.key.name(event.key)) in range(1, len(self.currentPlayer.hand)+1):
+                    print ("you selected key {}\n".format(pg.key.name(event.key)))
+                    # change the selected key
+                    self.selectedCard[0] = pg.key.name(event.key)
+                    self.selectedCard[1] = event.key
+                    self.gameState = 'confirm card'
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def card_select_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # TODO: for cards in opponent's hand
+        for i in range(0, 6):
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.currentPlayer.hand):
+            img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
+
+        pg.display.update()
+
+
+    def confirm_card_events(self):
+        # change your card selection or confirm it with ENTER
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+                if int(pg.key.name(event.key)) in range(1, len(self.currentPlayer.hand)+1):
+                    print ("you selected key {}\n".format(pg.key.name(event.key)))
+                    # change the selected key
+                    self.selectedCard[0] = pg.key.name(event.key)
+                    self.selectedCard[1] = event.key
+                    self.gameState = 'confirm card'
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                self.gameState = 'select opp card'
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def confirm_card_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # TODO: for cards in opponent's handl
+        for i in range(0, 6):
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.currentPlayer.hand):
+            img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
+
+        self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
+
+    def select_opp_events(self):
+        for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
-    
-    def playing_draw(self):
-        self.screen.fill(pg.Color("black"))
-        self.draw_text("This screen will be for the game", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//3], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("made it to the game!", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2.5], 24, pg.Color("white"), pg.font.get_default_font(), True)
+
+    def select_opp_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # TODO: for cards in opponent's handl
+        for i in range(0, 6):
+            # TODO: if card has shield, draw shield
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.currentPlayer.hand):
+            img = pg.image.load(j.get_image_path()).convert()
+            rect = img.get_rect()
+
+            # this will help distinguish the card picked
+            if (i == int(self.selectedCard[0])-1):
+                rect.topleft = (100+(170*i),330)
+            else:
+                rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
+
+        #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Now it's time to select an opponent card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
 

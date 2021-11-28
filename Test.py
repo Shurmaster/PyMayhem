@@ -1,5 +1,5 @@
-from PlayerClass import Player
-from CardClass import Card
+from Player import Player
+from Card import Card
 import random
 
 def UseCard(ply, n):
