@@ -60,7 +60,7 @@ class Player(ABC):
             self.hand += self.deck.draw(self.active_card.draw)
             print(f"- Drew {self.active_card.draw} card{'s' if self.active_card.draw > 1 else ''}!")
 
-    def attack(self, opponent, dmg=None, bypass_shields=False):
+    def attack(self, opponent, pick_shield, dmg=None, bypass_shields=False):
         if dmg is None: # provide the option to manually set damage for mighty powers
             dmg = self.active_card.damage
         if opponent.disguised:
@@ -71,12 +71,15 @@ class Player(ABC):
             if opponent.shield and not bypass_shields:
                 # choose shield if multiple are available
                 if len(opponent.shield) > 1:
-                    prompt =  "{self.name}, which shield will you attack?\n"
-                    prompt += ", ".join([f"{i + 1}: {shield}" for i, shield in enumerate(opponent.shield)])
-                    prompt += "\n> "
-                    while (choice := input(prompt)) not in [str(i + 1) for i in range(len(opponent.shield))]:
-                        print("Invalid choice, please try again.\n")
-                    choice = int(choice) - 1
+                    # prompt =  "{self.name}, which shield will you attack?\n"
+                    # prompt += ", ".join([f"{i + 1}: {shield}" for i, shield in enumerate(opponent.shield)])
+                    # prompt += "\n> "
+                    # while (choice := input(prompt)) not in [str(i + 1) for i in range(len(opponent.shield))]:
+                    #     print("Invalid choice, please try again.\n")
+                    # choice = int(choice) - 1
+
+                    # only need to pass in the shield choice here
+                    choice = pick_shield - 1
                     damage_dealt = min(opponent.shield[choice], dmg)
                     print(f"- Dealt {damage_dealt} damage to the opponent's shield!", end=' ')
                     opponent.shield[choice] -= dmg
@@ -100,7 +103,7 @@ class Player(ABC):
                 dmg -= damage_dealt
                 print(f"- Dealt {damage_dealt} damage to {opponent.name}!")
 
-    def take_turn_game(self, *, opponent, choice):
+    def take_turn_game(self, *, opponent, hand_choice, opp_choice):
         self.turns = 1
         if self.disguised:
             self.disguised = False
@@ -112,7 +115,7 @@ class Player(ABC):
 
             # we will already know what the choice is from key inputs
             # just pass it in straight from parameters
-            self.active_card = self.hand.pop(int(choice) - 1)
+            self.active_card = self.hand.pop(int(hand_choice) - 1)
             print(f"{self.name} played {self.active_card.name}!")
 
             # take card actions
@@ -120,7 +123,7 @@ class Player(ABC):
             self.apply_shield()
             self.extra_turns()
             self.draw()
-            self.attack(opponent)
+            self.attack(opponent, opp_choice)
             self.mighty_power_1(opponent)
             self.mighty_power_2(opponent)
             self.mighty_power_3(opponent)

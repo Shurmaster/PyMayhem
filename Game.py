@@ -30,12 +30,17 @@ class Game:
         # info pertaining to the game
         self.turn = 0
         self.currentPlayer = self.P1 # switches during hot seat
-        self.attacker = None
-        self.defender = None
+        self.attacker = self.P1
+        self.defender = self.P2
 
     # starting up the screen
     def start(self):
         self.setup() # run setup only once
+
+        #DEBUG STUFF
+        # for card in self.players[1].deck.cards:
+        #     print(repr(card))
+
         while self.gameRunning:
             if self.gameState == 'start':
                 self.start_events()
@@ -49,6 +54,9 @@ class Game:
             elif self.gameState == 'end turn':
                 self.turn_end_events()
                 self.turn_end_draw()
+            elif self.gameState == 'select shield':
+                self.shield_select_events()
+                self.shield_select_draw()
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
@@ -134,10 +142,15 @@ class Game:
     def card_select_draw(self):
         self.screen.fill(pg.Color("white"))
 
-        # TODO: for cards in opponent's hand
-        for i in range(0, 6):
-            # TODO: if card has shield, draw shield
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+        # drawing groups of shields
+        for i in range(0, len(self.defender.shield)):
+            for j in range(0, self.defender.shield[i]):
+                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
+
+        # # TODO: for cards in opponent's hand
+        # for i in range(0, 6):
+        #     # TODO: if card has shield, draw shield
+        #     pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
 
         # TODO: if card has shield, draw shield
         for i, j in enumerate(self.currentPlayer.hand):
@@ -162,12 +175,23 @@ class Game:
                     self.selectedCard[1] = event.key
                     self.gameState = 'confirm card'
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                # check length of opponent's shield, and do a select shield if necessary
+
                 self.attacker = self.players[self.turn % 2]
                 self.defender = self.players[(self.turn + 1) % 2]
-                self.attacker.take_turn_game(opponent=self.defender, choice=(int(self.selectedCard[0])-1))
-                self.turn += 1
 
-                self.gameState = 'end turn'
+                if len(self.defender.shield) > 1:
+                    self.gameState = 'select shield'
+
+                else:
+                    # self.attacker = self.players[self.turn % 2]
+                    # self.defender = self.players[(self.turn + 1) % 2]
+                    self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])-1), opp_choice=-1)
+                    self.turn += 1
+
+                    # if the opponent's HP is zero, then game over
+
+                    self.gameState = 'end turn'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -175,10 +199,15 @@ class Game:
     def confirm_card_draw(self):
         self.screen.fill(pg.Color("white"))
 
-        # TODO: for cards in opponent's handl
-        for i in range(0, 6):
-            # TODO: if card has shield, draw shield
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+        # drawing groups of shields
+        for i in range(0, len(self.defender.shield)):
+            for j in range(0, self.defender.shield[i]):
+                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
+
+        # # TODO: for cards in opponent's handl
+        # for i in range(0, 6):
+        #     # TODO: if card has shield, draw shield
+        #     pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
 
         # TODO: if card has shield, draw shield
         for i, j in enumerate(self.currentPlayer.hand):
@@ -220,8 +249,40 @@ class Game:
             self.screen.blit(img, rect)
 
         #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
-        self.draw_text("Now it's time to select an opponent card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Now your turn is over, executing actions.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
+
+    def shield_select_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def shield_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # drawing groups of shields
+        for i in range(0, len(self.defender.shield)):
+            for j in range(0, self.defender.shield[i]):
+                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
+
+        for i, j in enumerate(self.currentPlayer.hand):
+            img = pg.image.load(j.get_image_path()).convert()
+            rect = img.get_rect()
+
+            # this will help distinguish the card picked
+            if (i == int(self.selectedCard[0])-1):
+                rect.topleft = (100+(170*i),330)
+            else:
+                rect.topleft = (100+(170*i),350)
+            self.screen.blit(img, rect)
+
+        #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Now it's time to select an opponent shield.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
+
 
 
 
