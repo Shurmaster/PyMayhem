@@ -100,6 +100,35 @@ class Player(ABC):
                 dmg -= damage_dealt
                 print(f"- Dealt {damage_dealt} damage to {opponent.name}!")
 
+    def take_turn_game(self, *, opponent, choice):
+        self.turns = 1
+        if self.disguised:
+            self.disguised = False
+        while self.turns > 0:
+            print(repr(self))
+            # top up deck
+            if len(self.hand) == 0:
+                self.hand = self.deck.draw(2)
+
+            # we will already know what the choice is from key inputs
+            # just pass it in straight from parameters
+            self.active_card = self.hand.pop(int(choice) - 1)
+            print(f"{self.name} played {self.active_card.name}!")
+
+            # take card actions
+            self.heal()
+            self.apply_shield()
+            self.extra_turns()
+            self.draw()
+            self.attack(opponent)
+            self.mighty_power_1(opponent)
+            self.mighty_power_2(opponent)
+            self.mighty_power_3(opponent)
+            self.turns -= 1
+            self.graveyard.append(self.active_card)
+            self.active_card = None
+            print('-' * 20)
+
     def take_turn(self, *, opponent):
         self.turns = 1
         if self.disguised:
@@ -270,7 +299,7 @@ class GreenPlayer(Player):
                 opponent.shield.pop(0)
         else:
             print("- The opponent had no shields to destroy.")
-        
+
 
 class PurplePlayer(Player):
     def __init__(self, name):

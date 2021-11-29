@@ -7,18 +7,6 @@ from Player import *
 
 pg.init()
 
-# to help in loading large numbers of images
-# def load_images(self, my_path):
-#     # make a dictionary with keys as image names and values as loaded load_images
-#     image_dict = {}
-#     for dirpath, dirnames, filenames in os.walk(my_path):
-#         for filename in filenames:
-#             if filename.endswith('.png'):
-#                 key = filename[:-4]
-#                 img = pygame.image.load(os.path.join(dirpath, filename)).convert()
-#                 image_dict[key] = img
-#     return image_dict
-
 bg = pg.image.load("images/start_saver_600x600.jpg")
 # images = load_images("images")
 
@@ -36,12 +24,14 @@ class Game:
 
         # info for each player
         self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
-        self.P2 = YellowPlayer("Player 2",)
-        self.myL = (self.P1, self.P2)
+        self.P2 = YellowPlayer("Player 2")
+        self.players = [self.P1, self.P2]
 
         # info pertaining to the game
-        self.turn = 1
+        self.turn = 0
         self.currentPlayer = self.P1 # switches during hot seat
+        self.attacker = None
+        self.defender = None
 
     # starting up the screen
     def start(self):
@@ -56,9 +46,9 @@ class Game:
             elif self.gameState == 'confirm card':
                 self.confirm_card_events()
                 self.confirm_card_draw()
-            elif self.gameState == 'select opp card':
-                self.select_opp_events()
-                self.select_opp_draw()
+            elif self.gameState == 'end turn':
+                self.turn_end_events()
+                self.turn_end_draw()
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
@@ -172,7 +162,12 @@ class Game:
                     self.selectedCard[1] = event.key
                     self.gameState = 'confirm card'
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-                self.gameState = 'select opp card'
+                self.attacker = self.players[self.turn % 2]
+                self.defender = self.players[(self.turn + 1) % 2]
+                self.attacker.take_turn_game(opponent=self.defender, choice=(int(self.selectedCard[0])-1))
+                self.turn += 1
+
+                self.gameState = 'end turn'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -196,7 +191,7 @@ class Game:
         self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
-    def select_opp_events(self):
+    def turn_end_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
@@ -204,7 +199,7 @@ class Game:
                 pg.quit()
                 exit()
 
-    def select_opp_draw(self):
+    def turn_end_draw(self):
         self.screen.fill(pg.Color("white"))
 
         # TODO: for cards in opponent's handl
