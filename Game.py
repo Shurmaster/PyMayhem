@@ -20,8 +20,8 @@ class Game:
         self.screen = pg.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
         self.gameRunning = True
         self.gameState = 'start'
-        self.selectedCard = []
-        self.selectedShield = []
+        self.selectedCard = [None, None]
+        self.selectedShield = [None, None]
 
         # info for each player
         self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
@@ -30,9 +30,13 @@ class Game:
 
         # info pertaining to the game
         self.turn = 0
-        self.currentPlayer = self.P1 # switches during hot seat
-        self.attacker = self.P1
+        self.attacker = self.P1 # switch attacker/defender during hotseat
         self.defender = self.P2
+        self.action_strings = []
+        self.msg_cooldown = 3000
+        self.msg_time_total = 0
+        self.last = pg.time.get_ticks()
+        self.ctr = 0
 
     # starting up the screen
     def start(self):
@@ -61,6 +65,9 @@ class Game:
             elif self.gameState == 'confirm shield':
                 self.confirm_shield_events()
                 self.confirm_shield_draw()
+            elif self.gameState == 'game over':
+                self.game_over_events()
+                self.game_over_draw()
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
@@ -133,7 +140,7 @@ class Game:
             if event.type == pg.QUIT:
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
-                if int(pg.key.name(event.key)) in range(1, len(self.currentPlayer.hand)+1):
+                if int(pg.key.name(event.key)) in range(1, len(self.attacker.hand)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
                     # change the selected key
                     self.selectedCard[0] = pg.key.name(event.key)
@@ -146,18 +153,23 @@ class Game:
     def card_select_draw(self):
         self.screen.fill(pg.Color("white"))
 
+        # HP
+        self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+
+
+        # opponent's hand
+        for i, j in enumerate(self.defender.hand):
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
-
-        # # TODO: for cards in opponent's hand
-        # for i in range(0, 6):
-        #     # TODO: if card has shield, draw shield
-        #     pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
 
         # TODO: if card has shield, draw shield
-        for i, j in enumerate(self.currentPlayer.hand):
+        for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
             rect.topleft = (100+(170*i),350)
@@ -172,7 +184,7 @@ class Game:
             if event.type == pg.QUIT:
                 self.gameRunning = False
             if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
-                if int(pg.key.name(event.key)) in range(1, len(self.currentPlayer.hand)+1):
+                if int(pg.key.name(event.key)) in range(1, len(self.attacker.hand)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
                     # change the selected key
                     self.selectedCard[0] = pg.key.name(event.key)
@@ -185,17 +197,19 @@ class Game:
                 self.defender = self.players[(self.turn + 1) % 2]
 
                 if len(self.defender.shield) > 1:
+                    # if there are shields, you need to select a shield now
                     self.gameState = 'select shield'
 
                 else:
-                    # self.attacker = self.players[self.turn % 2]
-                    # self.defender = self.players[(self.turn + 1) % 2]
-                    self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])-1), opp_choice=-1)
-                    self.turn += 1
+                    self.action_strings = self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])), opp_choice=-1)
 
-                    # if the opponent's HP is zero, then game over
+                    # if someone's HP is zero
+                    if (self.attacker.hp <= 0) or (self.defender.hp <= 0):
+                        self.gameState = 'game over'
+                    else:
+                        self.last = pg.time.get_ticks()
+                        self.gameState = 'end turn'
 
-                    self.gameState = 'end turn'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -203,58 +217,38 @@ class Game:
     def confirm_card_draw(self):
         self.screen.fill(pg.Color("white"))
 
+        # HP
+        self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+
+        # opponent's hand
+        for i, j in enumerate(self.defender.hand):
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
-
-        # # TODO: for cards in opponent's handl
-        # for i in range(0, 6):
-        #     # TODO: if card has shield, draw shield
-        #     pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
 
         # TODO: if card has shield, draw shield
-        for i, j in enumerate(self.currentPlayer.hand):
+        for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
-            rect.topleft = (100+(170*i),350)
-            self.screen.blit(img, rect)
-
-        self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
-        self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
-        pg.display.update()
-
-    def turn_end_events(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.gameRunning = False
-            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-                pg.quit()
-                exit()
-
-    def turn_end_draw(self):
-        self.screen.fill(pg.Color("white"))
-
-        # TODO: for cards in opponent's handl
-        for i in range(0, 6):
-            # TODO: if card has shield, draw shield
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
-
-        # TODO: if card has shield, draw shield
-        for i, j in enumerate(self.currentPlayer.hand):
-            img = pg.image.load(j.get_image_path()).convert()
-            rect = img.get_rect()
-
-            # this will help distinguish the card picked
-            if (i == int(self.selectedCard[0])-1):
+            if i == int(self.selectedCard[0])-1:
                 rect.topleft = (100+(170*i),330)
             else:
                 rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
 
-        #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
-        self.draw_text("Now your turn is over, executing actions.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        try:
+            self.draw_text("You selected card {}".format(self.attacker.hand[int(self.selectedCard[0])-1].id), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        except IndexError:
+            pass
+
+        self.draw_text("Press ENTER to confirm your selection, or a number to select another card.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
+
 
     def shield_select_events(self):
         for event in pg.event.get():
@@ -274,20 +268,24 @@ class Game:
     def shield_draw(self):
         self.screen.fill(pg.Color("white"))
 
+        # HP
+        self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+
+        # opponent's hand
+        for i, j in enumerate(self.defender.hand):
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
+                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
 
-        for i, j in enumerate(self.currentPlayer.hand):
+        for i, j in enumerate(self.attacker.hand):
             img = pg.image.load(j.get_image_path()).convert()
             rect = img.get_rect()
-
-            # this will help distinguish the card picked
-            if (i == int(self.selectedCard[0])-1):
-                rect.topleft = (100+(170*i),330)
-            else:
-                rect.topleft = (100+(170*i),350)
+            rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
 
         #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
@@ -310,12 +308,15 @@ class Game:
 
                 self.attacker = self.players[self.turn % 2]
                 self.defender = self.players[(self.turn + 1) % 2]
-                self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])-1), opp_choice=int(selectedShield[1])+1)
-                self.turn += 1
+                self.action_strings = self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])), opp_choice=int(selectedShield[1])+1)
 
-                # if the opponent's HP is zero, then game over
+                # if someone's HP is zero
+                if (self.attacker.hp <= 0) or (self.defender.hp <= 0):
+                    self.gameState = 'game over'
+                else:
+                    self.last = pg.time.get_ticks()
+                    self.gameState = 'end turn'
 
-                self.gameState = 'end turn'
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 pg.quit()
                 exit()
@@ -323,18 +324,21 @@ class Game:
     def confirm_shield_draw(self):
         self.screen.fill(pg.Color("white"))
 
+        # HP
+        self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+
+        # opponent's hand
+        for i, j in enumerate(self.defender.hand):
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "pink", pg.Rect(120+(120*i)+(35*j), 0, 30, 30))
+                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
 
-        # # TODO: for cards in opponent's handl
-        # for i in range(0, 6):
-        #     # TODO: if card has shield, draw shield
-        #     pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
-
-        # TODO: if card has shield, draw shield
-        for i, j in enumerate(self.currentPlayer.hand):
+        for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
             rect.topleft = (100+(170*i),350)
@@ -342,6 +346,101 @@ class Game:
 
         self.draw_text("You selected shield {}".format(self.selectedShield[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Press ENTER to confirm your selection, or a number to select another shield.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
+
+
+    def turn_end_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+
+                self.action_strings.clear() # empty this list for the next round
+                self.ctr = 0 # set the list index for action strings back to 0
+
+                # drawing a card for the prev player each round
+                self.attacker.hand.append(self.attacker.deck.draw())
+
+                # swap the players
+                self.turn += 1
+                self.attacker = self.players[self.turn % 2]
+                self.defender = self.players[(self.turn + 1) % 2]
+
+                # start round over again
+                self.gameState = 'select card'
+
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def turn_end_draw(self):
+        self.screen.fill(pg.Color("white"))
+
+        # HP
+        self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+
+        # opponent's hand
+        for i, j in enumerate(self.defender.hand):
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+
+        # drawing groups of shields
+        for i in range(0, len(self.defender.shield)):
+            for j in range(0, self.defender.shield[i]):
+                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.attacker.hand):
+            img = pg.image.load(j.get_image_path()).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+
+            self.screen.blit(img, rect)
+
+
+        # display actions of the card playeds
+        if self.msg_time_total >= self.msg_cooldown*(len(self.action_strings)):
+            self.draw_text(f"Press ENTER to end your turn", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        else:
+            now = pg.time.get_ticks()
+            if now-self.last >= self.msg_cooldown:
+                self.last = now
+                self.msg_time_total += self.msg_cooldown
+                self.ctr+=1
+                try:
+                    self.draw_text(f"{self.action_strings[self.ctr]}", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("black"), pg.font.get_default_font(), True)
+                except IndexError:
+                    pass
+            else:
+                self.draw_text(f"{self.action_strings[self.ctr]}", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("black"), pg.font.get_default_font(), True)
+
+
+        #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("Now your turn is over, executing actions.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
+
+
+    def game_over_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT: # if we press the "X" close it or else we have to force close
+                self.gameRunning = False
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+
+    def game_over_draw(self):
+        self.screen.fill(pg.Color("black"))
+        self.draw_text('Game Over', self.screen, [SCREENWIDTH//2, SCREENHEIGHT//3], 32, pg.Color("white"), pg.font.get_default_font(), True)
+        winner = None
+        if self.attacker.hp < 0:
+            winner = self.attacker
+        else:
+            winner = self.defender
+
+        self.draw_text(f'{winner} has won the game!', self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 28, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("You can close the game now", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.65], 28, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
 

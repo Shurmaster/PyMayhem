@@ -42,16 +42,19 @@ class Player(ABC):
             self.hp += points
             if self.hp > 10: self.hp = 10
             print(f"- Healed for {points} points to {self.hp} HP!")
+            return f"- Healed for {points} points to {self.hp} HP!"
 
     def apply_shield(self):
         if self.active_card.armor:
             self.shield.append(self.active_card.armor)
             print(f"- Got {self.active_card.armor} armor!")
+            return f"- Got {self.active_card.armor} armor!"
 
     def extra_turns(self):
         if self.active_card.extra_turn:
             self.turns += self.active_card.extra_turn
             print(f"- Got {self.active_card.extra_turn} extra turn{'s' if self.active_card.extra_turn > 1 else ''}!")
+            return f"- Got {self.active_card.extra_turn} extra turn{'s' if self.active_card.extra_turn > 1 else ''}!"
 
     def draw(self):
         if self.active_card.draw:
@@ -59,49 +62,53 @@ class Player(ABC):
                 self.reload_deck()
             self.hand += self.deck.draw(self.active_card.draw)
             print(f"- Drew {self.active_card.draw} card{'s' if self.active_card.draw > 1 else ''}!")
+            return f"- Drew {self.active_card.draw} card{'s' if self.active_card.draw > 1 else ''}!"
 
     def attack(self, opponent, pick_shield, dmg=None, bypass_shields=False):
+        strings = []
         if dmg is None: # provide the option to manually set damage for mighty powers
             dmg = self.active_card.damage
         if opponent.disguised:
             print(f"- {opponent.name} was disguised and couldn't be attacked!")
-            return
+            strings.append(f"- {opponent.name} was disguised and couldn't be attacked!")
+            return strings
         while dmg > 0 and opponent.hp > 0: # keep attacking until we've spent all our damage
             # attack shields first
             if opponent.shield and not bypass_shields:
                 # choose shield if multiple are available
                 if len(opponent.shield) > 1:
-                    # prompt =  "{self.name}, which shield will you attack?\n"
-                    # prompt += ", ".join([f"{i + 1}: {shield}" for i, shield in enumerate(opponent.shield)])
-                    # prompt += "\n> "
-                    # while (choice := input(prompt)) not in [str(i + 1) for i in range(len(opponent.shield))]:
-                    #     print("Invalid choice, please try again.\n")
-                    # choice = int(choice) - 1
 
                     # only need to pass in the shield choice here
                     choice = pick_shield - 1
                     damage_dealt = min(opponent.shield[choice], dmg)
                     print(f"- Dealt {damage_dealt} damage to the opponent's shield!", end=' ')
+                    strings.append(f"- Dealt {damage_dealt} damage to the opponent's shield!")
                     opponent.shield[choice] -= dmg
                     dmg -= damage_dealt
                     if opponent.shield[choice] <= 0:
                         opponent.shield.pop(choice)
                         print("The shield broke!", end='')
+                        strings.append("The shield broke!")
                     print()
                 else: # only one shield available
                     damage_dealt = min(opponent.shield[0], dmg)
                     print(f"- Dealt {damage_dealt} damage to the opponent's shield!", end=' ')
+                    strings.append(f"- Dealt {damage_dealt} damage to the opponent's shield!")
                     opponent.shield[0] -= dmg
                     dmg -= damage_dealt
                     if opponent.shield[0] == 0:
                         opponent.shield.pop()
                         print("The shield broke!", end='')
+                        strings.append("The shield broke!")
                     print()
             else:
                 damage_dealt = min(opponent.hp, dmg)
                 opponent.hp -= damage_dealt
                 dmg -= damage_dealt
                 print(f"- Dealt {damage_dealt} damage to {opponent.name}!")
+                strings.append(f"- Dealt {damage_dealt} damage to {opponent.name}!")
+
+        return strings
 
     def take_turn_game(self, *, opponent, hand_choice, opp_choice):
         self.turns = 1
@@ -113,17 +120,21 @@ class Player(ABC):
             if len(self.hand) == 0:
                 self.hand = self.deck.draw(2)
 
+            strings = []
+
             # we will already know what the choice is from key inputs
             # just pass it in straight from parameters
             self.active_card = self.hand.pop(int(hand_choice) - 1)
             print(f"{self.name} played {self.active_card.name}!")
 
+            strings.append(f"{self.name} played {self.active_card.name}!")
+
             # take card actions
-            self.heal()
-            self.apply_shield()
-            self.extra_turns()
-            self.draw()
-            self.attack(opponent, opp_choice)
+            strings.append(self.heal())
+            strings.append(self.apply_shield())
+            strings.append(self.extra_turns())
+            strings.append(self.draw())
+            strings.extend(self.attack(opponent, opp_choice))
             self.mighty_power_1(opponent)
             self.mighty_power_2(opponent)
             self.mighty_power_3(opponent)
@@ -131,6 +142,8 @@ class Player(ABC):
             self.graveyard.append(self.active_card)
             self.active_card = None
             print('-' * 20)
+
+            return [value for value in strings if value != None]
 
     def take_turn(self, *, opponent):
         self.turns = 1
@@ -218,8 +231,9 @@ class YellowPlayer(Player):
         if not self.active_card.power_1:
             return
         """Deal 3 damage to all players, bypassing shields."""
-        self.attack(self, dmg=3, bypass_shields=True)
-        self.attack(opponent, dmg=3, bypass_shields=True)
+        opp_choice = -1
+        self.attack(self, opp_choice, dmg=3, bypass_shields=True)
+        self.attack(opponent, opp_choice, dmg=3, bypass_shields=True)
 
     def mighty_power_2(self, opponent):
         """Steal a shield from the opponent."""
@@ -261,7 +275,7 @@ class GreenPlayer(Player):
         if not self.active_card.power_1:
             return
         self.heal(points=1)
-        self.attack(opponent, dmg=1)
+        self.attack(opponent, opp_choice, dmg=1)
 
     def mighty_power_2(self, opponent):
         """Each player replaces their hand."""
