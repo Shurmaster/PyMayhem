@@ -33,10 +33,10 @@ quantity,id,deck,armor,draw,damage,extra_turn,heal,power_1,power_2,power_3
 1,stoneskin,yellow,2,0,0,0,0,FALSE,FALSE,FALSE
 1,mirror-image,yellow,3,0,0,0,0,FALSE,FALSE,FALSE
 1,knowledge-is-power,yellow,0,3,0,0,0,FALSE,FALSE,FALSE
-2,evil-seer,yellow,0,0,0,0,1,FALSE,FALSE,FALSE
+2,evil-sneer,yellow,0,0,0,1,1,FALSE,FALSE,FALSE
 3,speed-thought,yellow,0,0,0,2,0,FALSE,FALSE,FALSE
-2,charm,yellow,0,0,0,0,0,FALSE,FALSE,TRUE
-2,vampiric-touch,yellow,0,0,0,0,0,FALSE,TRUE,FALSE
+2,charm,yellow,0,0,0,0,0,FALSE,TRUE,FALSE
+2,vampiric-touch,yellow,0,0,0,0,0,FALSE,FALSE,TRUE
 2,fireball,yellow,0,0,0,0,0,TRUE,FALSE,FALSE
 5,one-thrown-dagger,purple,0,0,1,1,0,FALSE,FALSE,FALSE
 4,two-thrown-dagger,purple,0,0,2,0,0,FALSE,FALSE,FALSE

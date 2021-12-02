@@ -136,6 +136,7 @@ class Game:
     ###################################### GAME PLAY HELPER FUNCTIONS #####################################
     # select the card from your hand you want to play
     def card_select_events(self):
+        self.msg_time_total = 0
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
@@ -154,9 +155,11 @@ class Game:
         self.screen.fill(pg.Color("white"))
 
         # HP
+        self.draw_text(self.attacker.name, self.screen, [15, 475], 24, pg.Color("blue"), pg.font.get_default_font(), False)
         self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"Turns: {self.attacker.turns}", self.screen, [15, 525], 24, pg.Color("green"), pg.font.get_default_font(), False)
+        self.draw_text(self.defender.name, self.screen, [15, 25], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
 
 
         # opponent's hand
@@ -218,9 +221,11 @@ class Game:
         self.screen.fill(pg.Color("white"))
 
         # HP
+        self.draw_text(self.attacker.name, self.screen, [15, 475], 24, pg.Color("blue"), pg.font.get_default_font(), False)
         self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"Turns: {self.attacker.turns}", self.screen, [15, 525], 24, pg.Color("green"), pg.font.get_default_font(), False)
+        self.draw_text(self.defender.name, self.screen, [15, 25], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
@@ -269,9 +274,11 @@ class Game:
         self.screen.fill(pg.Color("white"))
 
         # HP
+        self.draw_text(self.attacker.name, self.screen, [15, 475], 24, pg.Color("blue"), pg.font.get_default_font(), False)
         self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"Turns: {self.attacker.turns}", self.screen, [15, 525], 24, pg.Color("green"), pg.font.get_default_font(), False)
+        self.draw_text(self.defender.name, self.screen, [15, 25], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
@@ -305,10 +312,11 @@ class Game:
                     self.selectedShield[1] = event.key
                     self.gameState = 'confirm shield'
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-
-                self.attacker = self.players[self.turn % 2]
-                self.defender = self.players[(self.turn + 1) % 2]
-                self.action_strings = self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])), opp_choice=int(selectedShield[1])+1)
+                if self.attacker.turns == 0:
+                    self.attacker = self.players[self.turn % 2]
+                    self.defender = self.players[(self.turn + 1) % 2]
+                    self.attacker.turns = 1
+                self.action_strings = self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])), opp_choice=int(self.selectedShield[1])+1)
 
                 # if someone's HP is zero
                 if (self.attacker.hp <= 0) or (self.defender.hp <= 0):
@@ -325,9 +333,11 @@ class Game:
         self.screen.fill(pg.Color("white"))
 
         # HP
+        self.draw_text(self.attacker.name, self.screen, [15, 475], 24, pg.Color("blue"), pg.font.get_default_font(), False)
         self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"Turns: {self.attacker.turns}", self.screen, [15, 525], 24, pg.Color("green"), pg.font.get_default_font(), False)
+        self.draw_text(self.defender.name, self.screen, [15, 25], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
@@ -361,16 +371,12 @@ class Game:
 
                 # drawing a card for the prev player each round
                 self.attacker.hand.append(self.attacker.deck.draw())
-
-                # before doing this, check that the current attacker doesn't have any actions left
-                # and if they do have actions left
-                # change the gameState to 'select card'
-                # decrease the current attacker's # of actions by 1
-
-                # swap the players
-                self.turn += 1
-                self.attacker = self.players[self.turn % 2]
-                self.defender = self.players[(self.turn + 1) % 2]
+                if self.attacker.turns == 0:
+                    # swap the players
+                    self.turn += 1
+                    self.attacker = self.players[self.turn % 2]
+                    self.defender = self.players[(self.turn + 1) % 2]
+                    self.attacker.turns = 1
 
                 # start round over again
                 self.gameState = 'select card'
@@ -383,9 +389,11 @@ class Game:
         self.screen.fill(pg.Color("white"))
 
         # HP
+        self.draw_text(self.attacker.name, self.screen, [15, 475], 24, pg.Color("blue"), pg.font.get_default_font(), False)
         self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text("Opponent's", self.screen, [15, 25], 24, pg.Color("blue"), pg.font.get_default_font(), False)
-        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"Turns: {self.attacker.turns}", self.screen, [15, 525], 24, pg.Color("green"), pg.font.get_default_font(), False)
+        self.draw_text(self.defender.name, self.screen, [15, 25], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
@@ -407,7 +415,10 @@ class Game:
 
         # display actions of the card playeds
         if self.msg_time_total >= self.msg_cooldown*(len(self.action_strings)):
-            self.draw_text(f"Press ENTER to end your turn", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
+            if self.attacker.turns == 0:
+                self.draw_text(f"Press ENTER to end your turn", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
+            else:
+                self.draw_text(f"Press ENTER to continue your turn ({self.attacker.turns} remaining)", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
         else:
             now = pg.time.get_ticks()
             if now-self.last >= self.msg_cooldown:
@@ -439,7 +450,7 @@ class Game:
         self.screen.fill(pg.Color("black"))
         self.draw_text('Game Over', self.screen, [SCREENWIDTH//2, SCREENHEIGHT//3], 32, pg.Color("white"), pg.font.get_default_font(), True)
         winner = None
-        if self.attacker.hp < 0:
+        if self.attacker.hp > 0:
             winner = self.attacker
         else:
             winner = self.defender
