@@ -362,6 +362,11 @@ class Game:
                 # drawing a card for the prev player each round
                 self.attacker.hand.append(self.attacker.deck.draw())
 
+                # before doing this, check that the current attacker doesn't have any actions left
+                # and if they do have actions left
+                # change the gameState to 'select card'
+                # decrease the current attacker's # of actions by 1
+
                 # swap the players
                 self.turn += 1
                 self.attacker = self.players[self.turn % 2]
