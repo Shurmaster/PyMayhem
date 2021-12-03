@@ -26,7 +26,7 @@ class Game:
 
         # info for each player
         self.P1 = RedPlayer("Player 1") # deck ID 1 will be yellow
-        self.P2 = YellowPlayer("Player 2")
+        self.P2 = RedPlayer("Player 2")
         self.players = [self.P1, self.P2]
 
         # info pertaining to the game
@@ -147,7 +147,7 @@ class Game:
                 self.gameRunning = False
                 #If a player were to start their turn with no cards in hand; They can draw 2.
 
-            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7, pg.K_8, pg.K_9]):
                 if int(pg.key.name(event.key)) in range(1, len(self.attacker.hand)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
                     # change the selected key
@@ -176,18 +176,25 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert_alpha()
+                img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
-                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
-        # TODO: if card has shield, draw shield
+        # attacker hand
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
             rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
+
+        # drawing attacker shield
+        for i in range(0, len(self.attacker.shield)):
+            for j in range(0, self.attacker.shield[i]):
+                img = pg.image.load("images/shield_a.png").convert_alpha()
+                rect = img.get_rect()
+                rect.topleft = (100+(170*i)+(42*j), 315)
+                self.screen.blit(img, rect)
 
         pg.display.update()
 
@@ -197,7 +204,7 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
-            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7, pg.K_8, pg.K_9]):
                 if int(pg.key.name(event.key)) in range(1, len(self.attacker.hand)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
                     # change the selected key
@@ -250,14 +257,14 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert_alpha()
+                img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
-                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
 
-        # TODO: if card has shield, draw shield
+
+        # attacker hand
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
@@ -266,6 +273,16 @@ class Game:
             else:
                 rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
+
+        # drawing attacker shield
+        for i in range(0, len(self.attacker.shield)):
+            for j in range(0, self.attacker.shield[i]):
+                img = pg.image.load("images/shield_a.png").convert_alpha()
+                rect = img.get_rect()
+                rect.topleft = (100+(170*i)+(42*j), 315)
+                self.screen.blit(img, rect)
+
+
 
         try:
             self.draw_text("You selected card {}".format(self.attacker.hand[int(self.selectedCard[0])-1].id), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
@@ -280,7 +297,7 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
-            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7, pg.K_8, pg.K_9]):
                 if int(pg.key.name(event.key)) in range(1, len(self.defender.shield)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
                     # change the selected key
@@ -309,18 +326,27 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert_alpha()
+                img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
-                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
 
+        # attacker hand
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load(j.get_image_path()).convert()
             rect = img.get_rect()
             rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
+
+
+        # drawing attacker shield
+        for i in range(0, len(self.attacker.shield)):
+            for j in range(0, self.attacker.shield[i]):
+                img = pg.image.load("images/shield_a.png").convert_alpha()
+                rect = img.get_rect()
+                rect.topleft = (100+(170*i)+(42*j), 315)
+                self.screen.blit(img, rect)
 
         #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Now it's time to select an opponent shield.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
@@ -331,7 +357,7 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
-            if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7, pg.K_8, pg.K_9]):
                 if int(pg.key.name(event.key)) in range(1, len(self.defender.shield)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
                     # change the selected key
@@ -373,18 +399,25 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert_alpha()
+                img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
-                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
-
+        # attacker hand
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
             rect.topleft = (100+(170*i),350)
             self.screen.blit(img, rect)
+
+        # drawing attacker shield
+        for i in range(0, len(self.attacker.shield)):
+            for j in range(0, self.attacker.shield[i]):
+                img = pg.image.load("images/shield_a.png").convert_alpha()
+                rect = img.get_rect()
+                rect.topleft = (100+(170*i)+(42*j), 315)
+                self.screen.blit(img, rect)
 
         self.draw_text("You selected shield {}".format(self.selectedShield[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Press ENTER to confirm your selection, or a number to select another shield.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("red"), pg.font.get_default_font(), True)
@@ -405,7 +438,7 @@ class Game:
                     self.attacker.hand.extend(self.attacker.deck.draw(2))
                 if self.attacker.turns == 0:
                     # swap the players
-                    self.defender.hand.append(self.defender.deck.draw())
+                    self.attacker.hand.append(self.attacker.deck.draw())
                     self.turn += 1
                     self.attacker = self.players[self.turn % 2]
                     self.defender = self.players[(self.turn + 1) % 2]
@@ -438,23 +471,27 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert_alpha()
+                img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
-                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
-        # player's hand
 
-        if self.attacker.turns == 0:
-            for i, j in enumerate(self.attacker.hand):
-                pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 249))
-        else:
-        # TODO: if card has shield, draw shield
-            for i, j in enumerate(self.attacker.hand):
-                img = pg.image.load(j.get_image_path()).convert()
+        # attacker hand
+        for i, j in enumerate(self.attacker.hand):
+            img = pg.image.load(j.get_image_path()).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+
+            self.screen.blit(img, rect)
+
+
+        # drawing attacker shield
+        for i in range(0, len(self.attacker.shield)):
+            for j in range(0, self.attacker.shield[i]):
+                img = pg.image.load("images/shield_a.png").convert_alpha()
                 rect = img.get_rect()
-                rect.topleft = (100+(170*i),350)
+                rect.topleft = (100+(170*i)+(42*j), 315)
                 self.screen.blit(img, rect)
 
 
@@ -527,11 +564,11 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert_alpha()
+                img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
-                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
+
 
         # TODO: if card has shield, draw shield
         """for i, j in enumerate(self.attacker.hand):
