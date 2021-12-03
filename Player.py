@@ -1,5 +1,6 @@
 import Card
 from abc import ABC, abstractmethod
+import random as rand
 
 class Player(ABC):
     def __init__(self, name, color):
@@ -86,7 +87,7 @@ class Player(ABC):
                 if len(opponent.shield) > 1:
 
                     # only need to pass in the shield choice here
-                    choice = pick_shield - 1
+                    choice = pick_shield
                     damage_dealt = min(opponent.shield[choice], dmg)
                     print(f"- Dealt {damage_dealt} damage to the opponent's shield!", end=' ')
                     strings.append(f"- Dealt {damage_dealt} damage to the opponent's shield!")
@@ -233,7 +234,7 @@ class RedPlayer(Player):
                 return [f"- All of {player.name}'s shields were destroyed!"]
     def mighty_power_3(self, opponent, shield_choice):
         """Red player has no third mighty power."""
-        return [] 
+        return [f"- uwu"] 
 
 class YellowPlayer(Player):
     def __init__(self, name):
@@ -280,6 +281,7 @@ class GreenPlayer(Player):
             return
         self.heal(points=1)
         self.attack(opponent=opponent, opp_choice=-1, dmg=1)
+        return [f"- {self.name} Has played Whirlwind; Inflicting damage to their opponent and healed themselves."]
 
     def mighty_power_2(self, opponent, shield_choice):
         """Each player replaces their hand."""
@@ -326,10 +328,13 @@ class PurplePlayer(Player):
     def __init__(self, name):
         super().__init__(name, "purple")
 
-    def mighty_power_1(self, opponent, shield_choice):
+    def mighty_power_1(self, opponent, shield_choice, t=None):
         if not self.active_card.power_1:
             return
-        self.disguised = True
+        if t == None:
+            self.disguised = True
+        else:
+            t.disguised = True
         print(f"- {self.name} put on a clever disguise! Their HP and shields can't be affected until their next turn!")
 
     def mighty_power_2(self, opponent, shield_choice):
@@ -358,7 +363,24 @@ class PurplePlayer(Player):
 
     def mighty_power_3(self, opponent, shield_choice):
         """Take the top card of the opponent's deck and play it."""
+        """Actually let's change it to: Get an additional Turn and have Opp discard 2 random cards"""
         ...
+        if not self.active_card.power_2:
+            return
+        if opponent.disguised:
+            print(f"- {opponent.name} was disguised and couldn't be affected!")
+            return
+        if len(opponent.hand) >= 2:
+            for i in range(2):
+                myrand = rand.randint(0, len(opponent.hand))
+                opponent.graveyard.append(opponent.hand.pop(myrand))
+        else:
+            opponent.graveyard.append(opponent.hand.pop(0))
+
+        return [
+            f"You made {opponent.name} discard {'2 cards from his' if len(opponent.hand) > 0 else 'their entire'} hand and gained an extra action."           
+            ]
+
 
 if __name__ == "__main__":
     players = [YellowPlayer("skylar"), RedPlayer("test dummy")]

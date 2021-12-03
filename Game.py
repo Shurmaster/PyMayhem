@@ -359,7 +359,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                if i == int(self.selectedShield[0])-1:
+                if i == int(self.selectedShield[0])- 1:
                     pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 20, 15, 15))                    
                 else:    
                     pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
@@ -504,11 +504,11 @@ class Game:
             for j in range(0, self.defender.shield[i]):
                 pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
         # TODO: if card has shield, draw shield
-        for i, j in enumerate(self.attacker.hand):
+        """for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
             rect = img.get_rect()
             rect.topleft = (100+(200),350)
-            self.screen.blit(img, rect)
+            self.screen.blit(img, rect)"""
         # GY Rectangle
         pg.draw.rect(self.screen, "gray", pg.Rect(60, 60, 1080, 480))
         pg.draw.rect(self.screen, "yellow", pg.Rect(450, 130, 315, 350))
