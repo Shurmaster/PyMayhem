@@ -26,7 +26,7 @@ class Game:
 
         # info for each player
         self.P1 = RedPlayer("Player 1") # deck ID 1 will be yellow
-        self.P2 = RedPlayer("Player 2")
+        self.P2 = YellowPlayer("Player 2")
         self.players = [self.P1, self.P2]
 
         # info pertaining to the game
@@ -405,7 +405,7 @@ class Game:
                     self.attacker.hand.extend(self.attacker.deck.draw(2))
                 if self.attacker.turns == 0:
                     # swap the players
-                    self.attacker.hand.append(self.attacker.deck.draw())
+                    self.defender.hand.append(self.defender.deck.draw())
                     self.turn += 1
                     self.attacker = self.players[self.turn % 2]
                     self.defender = self.players[(self.turn + 1) % 2]
@@ -444,13 +444,18 @@ class Game:
                 self.screen.blit(img, rect)
                 #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
-        # TODO: if card has shield, draw shield
-        for i, j in enumerate(self.attacker.hand):
-            img = pg.image.load(j.get_image_path()).convert()
-            rect = img.get_rect()
-            rect.topleft = (100+(170*i),350)
+        # player's hand
 
-            self.screen.blit(img, rect)
+        if self.attacker.turns == 0:
+            for i, j in enumerate(self.attacker.hand):
+                pg.draw.rect(self.screen, "blue", pg.Rect(100+(170*i), 350, 150, 249))
+        else:
+        # TODO: if card has shield, draw shield
+            for i, j in enumerate(self.attacker.hand):
+                img = pg.image.load(j.get_image_path()).convert()
+                rect = img.get_rect()
+                rect.topleft = (100+(170*i),350)
+                self.screen.blit(img, rect)
 
 
         # display actions of the card playeds
