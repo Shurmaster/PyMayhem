@@ -25,7 +25,7 @@ class Game:
 
         # info for each player
         self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
-        self.P2 = YellowPlayer("Player 2")
+        self.P2 = RedPlayer("Player 2")
         self.players = [self.P1, self.P2]
 
         # info pertaining to the game
@@ -140,6 +140,10 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.gameRunning = False
+            if len(self.attacker.hand) <= 0:                 
+                self.attacker.hand.extend(self.attacker.deck.draw(2))
+                #If a player were to start their turn with no cards in hand; They can draw 2.
+
             if event.type == pg.KEYDOWN and (event.key in [pg.K_0, pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6]):
                 if int(pg.key.name(event.key)) in range(1, len(self.attacker.hand)+1):
                     print ("you selected key {}\n".format(pg.key.name(event.key)))
@@ -369,14 +373,19 @@ class Game:
                 self.action_strings.clear() # empty this list for the next round
                 self.ctr = 0 # set the list index for action strings back to 0
 
-                # drawing a card for the prev player each round
-                self.attacker.hand.append(self.attacker.deck.draw())
+                
                 if self.attacker.turns == 0:
                     # swap the players
                     self.turn += 1
                     self.attacker = self.players[self.turn % 2]
                     self.defender = self.players[(self.turn + 1) % 2]
                     self.attacker.turns = 1
+                    # drawing a card for the prev player each round
+                    # Player should only be drawing cards at the beginning of turn
+                    # If they have no cards in hand; they will draw 2
+                    if len(self.attacker.hand) <= 0:                 
+                        self.attacker.hand.extend(self.attacker.deck.draw(2))
+                    self.attacker.hand.append(self.attacker.deck.draw())
 
                 # start round over again
                 self.gameState = 'select card'
