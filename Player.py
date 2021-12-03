@@ -278,19 +278,19 @@ class GreenPlayer(Player):
     def mighty_power_1(self, opponent, shield_choice):
         """Heal once, then attack once."""
         if not self.active_card.power_1:
-            return
+            return []
         self.heal(points=1)
-        self.attack(opponent=opponent, opp_choice=-1, dmg=1)
+        self.attack(opponent=opponent, pick_shield=-1, dmg=1, bypass_shields=True)
         return [f"- {self.name} Has played Whirlwind; Inflicting damage to their opponent and healed themselves."]
 
     def mighty_power_2(self, opponent, shield_choice):
         """Each player replaces their hand."""
         if not self.active_card.power_2:
-            return
+            return []
         for player in [self, opponent]:
             for card in player.hand:
                 player.graveyard.append(card)
-            if len(player.deck) < 3: # make sure deck has enough cards to draw
+            if len(player.deck.cards) < 3: # make sure deck has enough cards to draw
                 for card in player.graveyard:
                     player.deck.add_card(card)
                 player.graveyard.clear()
@@ -298,14 +298,16 @@ class GreenPlayer(Player):
             player.hand = player.deck.draw(3)
             print(f"- {player.name} discarded their hand!")
             print(f"- {player.name} drew 3 cards!")
+            return [f"- {player.name} discarded their hand!",
+                    f"- {player.name} drew 3 cards!"]
 
     def mighty_power_3(self, opponent, shield_choice):
         """Destroy one of the opponent's shields."""
         if not self.active_card.power_3:
-            return
+            return []
         if opponent.disguised:
             print(f"- {opponent.name} was disguised and couldn't be affected!")
-            return
+            return [f"- {opponent.name} was disguised and couldn't be affected!"]
         if opponent.shield:
             # choose shield if multiple are available
             if len(opponent.shield) > 1:
@@ -320,8 +322,10 @@ class GreenPlayer(Player):
             else: # only one shield available
                 print(f"- Destroyed the opponent's shield!")
                 opponent.shield.pop(0)
+            return [f"- Destroyed the opponent's shield!"]
         else:
             print("- The opponent had no shields to destroy.")
+            return ["- The opponent had no shields to destroy."]
 
 
 class PurplePlayer(Player):

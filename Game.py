@@ -627,13 +627,15 @@ class Game:
         pg.display.update()
 
 def random_player_color(playerStr):
-    #current decks: Red, Yellow
-    #arbitrarily: Red=1, Yellow=2
-    rand = random.randint(1,2)
+    #current decks: Red, Yellow, Green
+    #arbitrarily: Red=1, Yellow=2, Green=3
+    rand = random.randint(1,3)
     if rand == 1:
         return RedPlayer(playerStr)
     elif rand == 2:
         return YellowPlayer(playerStr)
+    elif rand == 3:
+        return GreenPlayer(playerStr)
 
 ######################################## MAIN ##############################################
 if __name__ == "__main__":
