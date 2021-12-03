@@ -130,6 +130,7 @@ class Player(ABC):
 
         # we will already know what the choice is from key inputs
         # just pass it in straight from parameters
+        print(f"hand_coiuce {hand_choice}")
         self.active_card = self.hand.pop(int(hand_choice) - 1)
         print(f"{self.name} played {self.active_card.name}!")
 
@@ -201,22 +202,23 @@ class RedPlayer(Player):
     def __init__(self, name):
         super().__init__(name, "red")
 
-    def mighty_power_1(self, opponent, shield_choice):
+        #strings.extend(self.mighty_power_1(opponent, opp_choice))
+
+
+
+    def mighty_power_1(self, opponent, choice):
         """Choose any card from your graveyard and place it in your hand."""
         if not self.active_card.power_1:
             return []
         if len(self.graveyard) == 0:
             return ["- No cards in GY!"]
-        prompt = f"- {self.name}, which card will you choose from the graveyard?"
-        for i, card in enumerate(self.graveyard):
-            prompt += f"\n{i + 1}: {card}"
-        prompt += "\n> "
-        while (choice := input(prompt)) not in [str(i + 1) for i in range(len(self.graveyard))]:
-            print("Invalid choice, try again.\n")
-        card = self.graveyard.pop(int(choice) - 1)
+
+        card = self.graveyard.pop(choice)
         self.hand.append(card)
         print(f"- {card.name} was added to your hand!")
         return [f"- {card.name} was added to your hand!"]
+
+
     def mighty_power_2(self, opponent, shield_choice):
         """Destroy all shields on both sides."""
         if not self.active_card.power_2:

@@ -22,10 +22,11 @@ class Game:
         self.gameState = 'start'
         self.selectedCard = [None, None]
         self.selectedShield = [None, None]
+        self.selectedGY = 0
 
         # info for each player
-        self.P1 = YellowPlayer("Player 1") # deck ID 1 will be yellow
-        self.P2 = YellowPlayer("Player 2")
+        self.P1 = RedPlayer("Player 1") # deck ID 1 will be yellow
+        self.P2 = RedPlayer("Player 2")
         self.players = [self.P1, self.P2]
 
         # info pertaining to the game
@@ -62,6 +63,9 @@ class Game:
             elif self.gameState == 'select shield':
                 self.shield_select_events()
                 self.shield_draw()
+            elif self.gameState == 'select gy':
+                self.gy_select_events()
+                self.gy_select_draw()
             elif self.gameState == 'confirm shield':
                 self.confirm_shield_events()
                 self.confirm_shield_draw()
@@ -71,6 +75,7 @@ class Game:
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
+    
 
     ######### GAME SETUP AND HANDLING ###########
     def setup(self):
@@ -195,6 +200,7 @@ class Game:
                     self.selectedCard[0] = pg.key.name(event.key)
                     self.selectedCard[1] = event.key
                     self.gameState = 'confirm card'
+    
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
                 # check length of opponent's shield, and do a select shield if necessary
 
@@ -205,8 +211,12 @@ class Game:
                 if len(self.defender.shield) > 1 and (active_card.damage > 0 or active_card.requires_shield_select):
                     # if there are shields, you need to select a shield now
                     self.gameState = 'select shield'
-
+                elif (active_card.deck == "red" and active_card.power_1) or (active_card.deck == "yellow" and active_card.power_2) or (active_card.deck == 'blue' and active_card.power_3) or (active_card.deck == 'purple' and active_card.power_2):
+                    print('Gotta select a GY')
+                    self.gameState = 'select gy'
                 else:
+                    print("Its not either of the if statements")
+                    print(f"ID: {active_card.deck} P1: {active_card.power_1} P2: {active_card.power_2} P3: {active_card.power_3}")
                     self.action_strings = self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])), opp_choice=-1)
 
                     # if someone's HP is zero
@@ -446,6 +456,91 @@ class Game:
 
         #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Now your turn is over, executing actions.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
+        pg.display.update()
+
+    def gy_select_events(self):
+        self.msg_time_total = 0
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.gameRunning = False
+                #If a player were to start their turn with no cards in hand; They can draw 2.
+            if event.type == pg.KEYDOWN and (event.key in [pg.K_a, pg.K_d]):
+                if event.key == pg.K_d:
+                    self.selectedGY += 1
+                else:
+                    self.selectedGY -= 1
+                if self.selectedGY <= 0:
+                    self.selectedGY = 0
+                if self.selectedGY >= len(self.attacker.graveyard) - 1:
+                    self.selectedGY = len(self.attacker.graveyard) - 1
+                print(self.selectedGY, len(self.attacker.graveyard) - 1, sep='\\')
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                print(1)
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                if self.attacker.turns == 0:
+                    self.attacker = self.players[self.turn % 2]
+                    self.defender = self.players[(self.turn + 1) % 2]
+                    self.attacker.turns = 1
+                self.action_strings = self.attacker.take_turn_game(opponent=self.defender, hand_choice=(int(self.selectedCard[0])) , opp_choice=self.selectedGY)
+                self.selectedGY = 0
+                self.gameState = 'end turn'
+
+
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                pg.quit()
+                exit()
+    def gy_select_draw(self):
+        self.screen.fill(pg.Color("white"))
+        # HP
+        self.draw_text(self.attacker.name, self.screen, [15, 475], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.attacker.hp}/10", self.screen, [15, 500], 24, pg.Color("blue"), pg.font.get_default_font(), False)
+        self.draw_text(f"Turns: {self.attacker.turns}", self.screen, [15, 525], 24, pg.Color("green"), pg.font.get_default_font(), False)
+        self.draw_text(self.defender.name, self.screen, [15, 25], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
+        # opponent's hand
+        for i, j in enumerate(self.defender.hand):
+            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+        # drawing groups of shields
+        for i in range(0, len(self.defender.shield)):
+            for j in range(0, self.defender.shield[i]):
+                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+        # TODO: if card has shield, draw shield
+        for i, j in enumerate(self.attacker.hand):
+            img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(200),350)
+            self.screen.blit(img, rect)
+        # GY Rectangle
+        pg.draw.rect(self.screen, "gray", pg.Rect(60, 60, 1080, 480))
+        pg.draw.rect(self.screen, "yellow", pg.Rect(450, 130, 315, 350))
+
+        #SCREENWIDTH = 1200
+        #SCREENHEIGHT = 600
+
+        
+        self.draw_text(f"Select Card in GY:", self.screen, [int(SCREENWIDTH * 0.45), int(SCREENHEIGHT * 0.25)], 24, pg.Color("Black"), pg.font.get_default_font(), False)
+        self.draw_text(f"GY: {self.selectedGY + 1}/{len(self.attacker.graveyard)}", self.screen, [int(SCREENWIDTH * 0.49), int(SCREENHEIGHT * 0.75)], 24, pg.Color("Black"), pg.font.get_default_font(), False)
+        
+        myCard = self.attacker.graveyard[self.selectedGY]
+        img = pg.image.load("images/{}/{}.jpg".format(myCard.deck, myCard.id)).convert()
+
+        rect = img.get_rect()
+        rect.topleft = (535,int(SCREENHEIGHT * 0.3))
+        self.screen.blit(img, rect)
+        if self.selectedGY > 0:
+            img2 = pg.image.load("images/{}/{}.jpg".format(self.attacker.graveyard[self.selectedGY - 1].deck, self.attacker.graveyard[self.selectedGY - 1].id)).convert()
+            rect2 = img2.get_rect()
+            self.draw_text("< [A]", self.screen, [400,int(SCREENHEIGHT * 0.3)], 24, pg.Color("black"), pg.font.get_default_font(), False)
+            rect2.topleft = (235,int(SCREENHEIGHT * 0.3))
+            self.screen.blit(img2, rect2)
+        if self.selectedGY < len(self.attacker.graveyard) - 1:
+            img3 = pg.image.load("images/{}/{}.jpg".format(self.attacker.graveyard[self.selectedGY + 1].deck, self.attacker.graveyard[self.selectedGY + 1].id)).convert()
+            rect3 = img3.get_rect()
+            self.draw_text("[D] >", self.screen, [785,int(SCREENHEIGHT * 0.3)], 24, pg.Color("black"), pg.font.get_default_font(), False)
+            rect3.topleft = (835,int(SCREENHEIGHT * 0.3))
+            self.screen.blit(img3, rect3)
+
+        self.screen.blit(img, rect)
         pg.display.update()
 
 
