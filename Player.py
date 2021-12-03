@@ -24,15 +24,15 @@ class Player(ABC):
         self.deck.shuffle()
 
     @abstractmethod
-    def mighty_power_1(self, opponent):
+    def mighty_power_1(self, opponent, shield_choice):
         ...
 
     @abstractmethod
-    def mighty_power_2(self, opponent):
+    def mighty_power_2(self, opponent, shield_choice):
         ...
 
     @abstractmethod
-    def mighty_power_3(self, opponent):
+    def mighty_power_3(self, opponent, shield_choice):
         ...
 
     def heal(self, points=None):
@@ -126,6 +126,7 @@ class Player(ABC):
             self.hand = self.deck.draw(2)
 
         strings = []
+        print(f"Opponent's shields: {opponent.shield}")
 
         # we will already know what the choice is from key inputs
         # just pass it in straight from parameters
@@ -140,9 +141,9 @@ class Player(ABC):
         strings.append(self.extra_turns())
         strings.append(self.draw())
         strings.extend(self.attack(opponent, opp_choice))
-        strings.extend(self.mighty_power_1(opponent))
-        strings.extend(self.mighty_power_2(opponent))
-        strings.extend(self.mighty_power_3(opponent))
+        strings.extend(self.mighty_power_1(opponent, opp_choice))
+        strings.extend(self.mighty_power_2(opponent, opp_choice))
+        strings.extend(self.mighty_power_3(opponent, opp_choice))
         strings = [item for item in strings if item]
         self.graveyard.append(self.active_card)
         self.active_card = None
@@ -192,7 +193,7 @@ class Player(ABC):
         s  = f"PLAYER {self.name}\n"
         s += f"HP: {self.hp}/10\n"
         s += f"Deck color: {self.color}\n"
-        s += f"Shields: {self.shield if self.shield else 'none'}\n"
+        s += f"Shields: {self.shield}\n"
         s += f"Turns: {self.turns}\n"
         return s
 
@@ -200,7 +201,7 @@ class RedPlayer(Player):
     def __init__(self, name):
         super().__init__(name, "red")
 
-    def mighty_power_1(self, opponent):
+    def mighty_power_1(self, opponent, shield_choice):
         """Choose any card from your graveyard and place it in your hand."""
         if not self.active_card.power_1:
             return []
@@ -216,7 +217,7 @@ class RedPlayer(Player):
         self.hand.append(card)
         print(f"- {card.name} was added to your hand!")
         return [f"- {card.name} was added to your hand!"]
-    def mighty_power_2(self, opponent):
+    def mighty_power_2(self, opponent, shield_choice):
         """Destroy all shields on both sides."""
         if not self.active_card.power_2:
             return []
@@ -228,7 +229,7 @@ class RedPlayer(Player):
                 player.shield.clear()
                 print(f"- All of {player.name}'s shields were destroyed!")
                 return [f"- All of {player.name}'s shields were destroyed!"]
-    def mighty_power_3(self, opponent):
+    def mighty_power_3(self, opponent, shield_choice):
         """Red player has no third mighty power."""
         return [] 
 
@@ -236,7 +237,7 @@ class YellowPlayer(Player):
     def __init__(self, name):
         super().__init__(name, "yellow")
 
-    def mighty_power_1(self, opponent):
+    def mighty_power_1(self, opponent, shield_choice):
         """Deal 3 damage to all players, bypassing shields."""
         if not self.active_card.power_1:
             return []
@@ -246,7 +247,7 @@ class YellowPlayer(Player):
             self.attack(opponent, opp_choice, dmg=3, bypass_shields=True)
         ]
 
-    def mighty_power_2(self, opponent):
+    def mighty_power_2(self, opponent, shield_choice):
         """Steal a shield from the opponent."""
         if not self.active_card.power_2:
             return []
@@ -254,21 +255,13 @@ class YellowPlayer(Player):
             return [f"- {opponent.name} was disguised and couldn't be affected!"]
         if opponent.shield:
             # choose shield if multiple are available
-            if len(opponent.shield) > 1:
-                prompt =  "{self.name}, which shield will you steal?\n"
-                prompt += ", ".join([f"{i + 1}: {shield}" for i, shield in enumerate(opponent.shield)])
-                prompt += "\n> "
-                while (choice := input(prompt)) not in [str(i + 1) for i in range(len(opponent.shield))]:
-                    print("Invalid choice, please try again.\n")
-                choice = int(choice) - 1
-                self.shield.append(opponent.shield.pop(int(choice) - 1))
-            else: # only one shield available
-                self.shield.append(opponent.shield.pop(0))
+            print(f"Stealing shield {shield_choice + 1}")
+            self.shield.append(opponent.shield.pop(shield_choice + 1))
             return ["- Stole the opponent's shield!"]
         else:
             return ["- The opponent had no shields to steal."]
 
-    def mighty_power_3(self, opponent):
+    def mighty_power_3(self, opponent, shield_choice):
         """Swap HP with the opponent."""
         if not self.active_card.power_3:
             return []
@@ -279,14 +272,14 @@ class GreenPlayer(Player):
     def __init__(self, name):
         super().__init__(name, "green")
 
-    def mighty_power_1(self, opponent):
+    def mighty_power_1(self, opponent, shield_choice):
         """Heal once, then attack once."""
         if not self.active_card.power_1:
             return
         self.heal(points=1)
         self.attack(opponent=opponent, opp_choice=-1, dmg=1)
 
-    def mighty_power_2(self, opponent):
+    def mighty_power_2(self, opponent, shield_choice):
         """Each player replaces their hand."""
         if not self.active_card.power_2:
             return
@@ -302,7 +295,7 @@ class GreenPlayer(Player):
             print(f"- {player.name} discarded their hand!")
             print(f"- {player.name} drew 3 cards!")
 
-    def mighty_power_3(self, opponent):
+    def mighty_power_3(self, opponent, shield_choice):
         """Destroy one of the opponent's shields."""
         if not self.active_card.power_3:
             return
@@ -331,13 +324,13 @@ class PurplePlayer(Player):
     def __init__(self, name):
         super().__init__(name, "purple")
 
-    def mighty_power_1(self, opponent):
+    def mighty_power_1(self, opponent, shield_choice):
         if not self.active_card.power_1:
             return
         self.disguised = True
         print(f"- {self.name} put on a clever disguise! Their HP and shields can't be affected until their next turn!")
 
-    def mighty_power_2(self, opponent):
+    def mighty_power_2(self, opponent, shield_choice):
         """Destroy one of the opponent's shields."""
         if not self.active_card.power_2:
             return
@@ -361,7 +354,7 @@ class PurplePlayer(Player):
         else:
             print("- The opponent had no shields to destroy.")
 
-    def mighty_power_3(self, opponent):
+    def mighty_power_3(self, opponent, shield_choice):
         """Take the top card of the opponent's deck and play it."""
         ...
 

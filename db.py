@@ -26,6 +26,7 @@ if __name__ == "__main__":
             power_1    INT NOT NULL,
             power_2    INT NOT NULL,
             power_3    INT NOT NULL,
+            requires_shield_select INT NOT NULL,
             name       TEXT NOT NULL
         )'''
         cur.execute(sql)
@@ -39,5 +40,5 @@ if __name__ == "__main__":
             for row in reader:
                 row['name'] = row['id'].title().replace('-', ' ').replace(' 2', '') # format names from
                 cards.append(tuple(row.values()))
-        cur.executemany('INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', cards)
+        cur.executemany('INSERT INTO cards VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)', cards)
         print("Done.")

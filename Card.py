@@ -6,7 +6,8 @@ class Card:
         self.__dict__.update(kwargs) # lil bit of spicy python magic
         self.power_1 = self.power_1 == "TRUE"
         self.power_2 = self.power_2 == "TRUE"
-        self.power_3= self.power_3 == "TRUE"
+        self.power_3 = self.power_3 == "TRUE"
+        self.requires_shield_select = self.requires_shield_select == "TRUE"
 
     def get_image_path(self):
         return f"images/{self.deck}/{self.id}.jpg"
