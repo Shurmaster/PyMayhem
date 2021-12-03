@@ -211,8 +211,7 @@ class Game:
                 if len(self.defender.shield) > 1 and (active_card.damage > 0 or active_card.requires_shield_select):
                     # if there are shields, you need to select a shield now
                     self.gameState = 'select shield'
-                elif (active_card.deck == "red" and active_card.power_1) or (active_card.deck == "yellow" and active_card.power_2) or (active_card.deck == 'blue' and active_card.power_3) or (active_card.deck == 'purple' and active_card.power_2):
-                    print('Gotta select a GY')
+                elif (active_card.deck == "red" and active_card.power_1) and len(self.attacker.graveyard) > 0:
                     self.gameState = 'select gy'
                 else:
                     print("Its not either of the if statements")
