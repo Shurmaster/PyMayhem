@@ -166,7 +166,7 @@ class Game:
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+            pg.draw.rect(self.screen, [92, 92, 92], pg.Rect(150+(150*i), 0, 100, 133))
 
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
@@ -247,7 +247,7 @@ class Game:
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+            pg.draw.rect(self.screen, [92, 92, 92], pg.Rect(150+(150*i), 0, 100, 133))
 
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
@@ -316,7 +316,7 @@ class Game:
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+            pg.draw.rect(self.screen, [92, 92, 92], pg.Rect(150+(150*i), 0, 100, 133))
 
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
@@ -389,7 +389,7 @@ class Game:
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+            pg.draw.rect(self.screen, [92, 92, 92], pg.Rect(150+(150*i), 0, 100, 133))
 
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
@@ -461,7 +461,7 @@ class Game:
 
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+            pg.draw.rect(self.screen, [92, 92, 92], pg.Rect(150+(150*i), 0, 100, 133))
 
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
@@ -472,22 +472,28 @@ class Game:
                 self.screen.blit(img, rect)
 
 
-        # attacker hand
-        for i, j in enumerate(self.attacker.hand):
-            img = pg.image.load(j.get_image_path()).convert()
-            rect = img.get_rect()
-            rect.topleft = (100+(170*i),350)
-
-            self.screen.blit(img, rect)
-
-
-        # drawing attacker shield
-        for i in range(0, len(self.attacker.shield)):
-            for j in range(0, self.attacker.shield[i]):
-                img = pg.image.load("images/shield_a.png").convert_alpha()
+        if self.attacker.turns == 0:
+            for i, j in enumerate(self.attacker.hand):
+                pg.draw.rect(self.screen, [38, 46, 115], pg.Rect(100+(170*i), 350, 150, 249))
+        else:
+            # attacker hand
+            for i, j in enumerate(self.attacker.hand):
+                img = pg.image.load(j.get_image_path()).convert()
                 rect = img.get_rect()
-                rect.topleft = (100+(170*i)+(42*j), 315)
+                rect.topleft = (100+(170*i),350)
+
                 self.screen.blit(img, rect)
+
+
+            # drawing attacker shield
+            for i in range(0, len(self.attacker.shield)):
+                for j in range(0, self.attacker.shield[i]):
+                    img = pg.image.load("images/shield_a.png").convert_alpha()
+                    rect = img.get_rect()
+                    rect.topleft = (100+(170*i)+(42*j), 315)
+                    self.screen.blit(img, rect)
+
+
 
 
         # display actions of the card playeds
@@ -555,7 +561,7 @@ class Game:
         self.draw_text(f"HP: {self.defender.hp}/10", self.screen, [15, 50], 24, pg.Color("red"), pg.font.get_default_font(), False)
         # opponent's hand
         for i, j in enumerate(self.defender.hand):
-            pg.draw.rect(self.screen, "pink", pg.Rect(150+(150*i), 0, 100, 133))
+            pg.draw.rect(self.screen, [92, 92, 92], pg.Rect(150+(150*i), 0, 100, 133))
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
