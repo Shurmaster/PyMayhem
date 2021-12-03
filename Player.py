@@ -256,7 +256,7 @@ class YellowPlayer(Player):
         if opponent.shield:
             # choose shield if multiple are available
             print(f"Stealing shield {shield_choice + 1}")
-            self.shield.append(opponent.shield.pop(shield_choice + 1))
+            self.shield.append(opponent.shield.pop(shield_choice))
             return ["- Stole the opponent's shield!"]
         else:
             return ["- The opponent had no shields to steal."]
