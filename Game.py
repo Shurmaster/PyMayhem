@@ -7,7 +7,8 @@ from Player import *
 
 pg.init()
 
-bg = pg.image.load("images/start_saver_600x600.jpg")
+bg = pg.image.load("images/start_saver_1200x600.jpg")
+help_screen = pg.image.load("images/help_screen.png")
 # images = load_images("images")
 
 ## Can have a separate file for globals if we want
@@ -18,6 +19,7 @@ SCREENHEIGHT = 600
 class Game:
     def __init__(self):
         self.screen = pg.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+        pg.display.set_caption("Py Mayhem")
         self.gameRunning = True
         self.gameState = 'start'
         self.selectedCard = [None, None]
@@ -128,14 +130,7 @@ class Game:
                 exit()
 
     def help_draw(self):
-        self.screen.fill(pg.Color("black"))
-        self.draw_text("Py Mayhem is an online version of the card game, Dungeon Mayhem", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//3], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("Placeholder", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2.5], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("Placeholder", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("Placeholder", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("Placeholder", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.6], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("Placeholder", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.4], 24, pg.Color("white"), pg.font.get_default_font(), True)
-        self.draw_text("Press SPACE to go back or Press ESCAPE to quit", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.2], 24, pg.Color("white"), pg.font.get_default_font(), True)
+        self.screen.blit(help_screen, (0, 0))
         pg.display.update()
 
     ###################################### GAME PLAY HELPER FUNCTIONS #####################################
