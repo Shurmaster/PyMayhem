@@ -75,7 +75,7 @@ class Game:
             elif self.gameState == 'help':
                 self.help_events()
                 self.help_draw()
-    
+
 
     ######### GAME SETUP AND HANDLING ###########
     def setup(self):
@@ -89,7 +89,7 @@ class Game:
     ######### GENERAL HELPER FUNCTIONS ###########
     def draw_text(self, text, screen, pos, size, color, fontname, wantCentered = False):
         font = pg.font.SysFont(fontname, size)
-        message = font.render(text, False, color)
+        message = font.render(text, True, color)
         msg_sz = message.get_size()
 
         if wantCentered:
@@ -176,7 +176,11 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                img = pg.image.load("images/shield.png").convert()
+                rect = img.get_rect()
+                rect.topleft = (150+(150*i)+(22*j), 145)
+                self.screen.blit(img, rect)
+                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
         # TODO: if card has shield, draw shield
         for i, j in enumerate(self.attacker.hand):
@@ -200,7 +204,7 @@ class Game:
                     self.selectedCard[0] = pg.key.name(event.key)
                     self.selectedCard[1] = event.key
                     self.gameState = 'confirm card'
-    
+
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
                 # check length of opponent's shield, and do a select shield if necessary
 
@@ -246,7 +250,12 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                img = pg.image.load("images/shield.png").convert()
+                rect = img.get_rect()
+                rect.topleft = (150+(150*i)+(22*j), 145)
+                self.screen.blit(img, rect)
+                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
+
 
         # TODO: if card has shield, draw shield
         for i, j in enumerate(self.attacker.hand):
@@ -300,7 +309,12 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                img = pg.image.load("images/shield.png").convert()
+                rect = img.get_rect()
+                rect.topleft = (150+(150*i)+(22*j), 145)
+                self.screen.blit(img, rect)
+                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
+
 
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load(j.get_image_path()).convert()
@@ -359,10 +373,12 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                if i == int(self.selectedShield[0])- 1:
-                    pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 20, 15, 15))                    
-                else:    
-                    pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                img = pg.image.load("images/shield.png").convert()
+                rect = img.get_rect()
+                rect.topleft = (150+(150*i)+(22*j), 145)
+                self.screen.blit(img, rect)
+                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
+
 
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
@@ -422,7 +438,11 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                img = pg.image.load("images/shield.png").convert()
+                rect = img.get_rect()
+                rect.topleft = (150+(150*i)+(22*j), 145)
+                self.screen.blit(img, rect)
+                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
 
         # TODO: if card has shield, draw shield
         for i, j in enumerate(self.attacker.hand):
@@ -502,7 +522,12 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                img = pg.image.load("images/shield.png").convert()
+                rect = img.get_rect()
+                rect.topleft = (150+(150*i)+(22*j), 145)
+                self.screen.blit(img, rect)
+                #pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 145, 15, 15))
+
         # TODO: if card has shield, draw shield
         """for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
@@ -516,10 +541,10 @@ class Game:
         #SCREENWIDTH = 1200
         #SCREENHEIGHT = 600
 
-        
+
         self.draw_text(f"Select Card in GY:", self.screen, [int(SCREENWIDTH * 0.45), int(SCREENHEIGHT * 0.25)], 24, pg.Color("Black"), pg.font.get_default_font(), False)
         self.draw_text(f"GY: {self.selectedGY + 1}/{len(self.attacker.graveyard)}", self.screen, [int(SCREENWIDTH * 0.49), int(SCREENHEIGHT * 0.75)], 24, pg.Color("Black"), pg.font.get_default_font(), False)
-        
+
         myCard = self.attacker.graveyard[self.selectedGY]
         img = pg.image.load("images/{}/{}.jpg".format(myCard.deck, myCard.id)).convert()
 
