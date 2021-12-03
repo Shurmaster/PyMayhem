@@ -176,7 +176,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert()
+                img = pg.image.load("images/shield.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
@@ -250,7 +250,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert()
+                img = pg.image.load("images/shield.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
@@ -309,7 +309,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert()
+                img = pg.image.load("images/shield.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
@@ -373,7 +373,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert()
+                img = pg.image.load("images/shield.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
@@ -438,7 +438,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert()
+                img = pg.image.load("images/shield.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
@@ -522,7 +522,7 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                img = pg.image.load("images/shield.png").convert()
+                img = pg.image.load("images/shield.png").convert_alpha()
                 rect = img.get_rect()
                 rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
