@@ -27,8 +27,8 @@ class Game:
         self.selectedGY = 0
 
         # info for each player
-        self.P1 = RedPlayer("Player 1") # deck ID 1 will be yellow
-        self.P2 = RedPlayer("Player 2")
+        self.P1 = random_player_color("Player 1")
+        self.P2 = random_player_color("Player 2")
         self.players = [self.P1, self.P2]
 
         # info pertaining to the game
@@ -626,8 +626,14 @@ class Game:
         self.draw_text("You can close the game now", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.65], 28, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
-
-
+def random_player_color(playerStr):
+    #current decks: Red, Yellow
+    #arbitrarily: Red=1, Yellow=2
+    rand = random.randint(1,2)
+    if rand == 1:
+        return RedPlayer(playerStr)
+    elif rand == 2:
+        return YellowPlayer(playerStr)
 
 ######################################## MAIN ##############################################
 if __name__ == "__main__":
