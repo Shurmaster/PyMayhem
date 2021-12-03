@@ -350,7 +350,10 @@ class Game:
         # drawing groups of shields
         for i in range(0, len(self.defender.shield)):
             for j in range(0, self.defender.shield[i]):
-                pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
+                if i == int(self.selectedShield[0])-1:
+                    pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 20, 15, 15))                    
+                else:    
+                    pg.draw.rect(self.screen, "orange", pg.Rect(120+(120*i)+(35*j), 0, 15, 15))
 
         for i, j in enumerate(self.attacker.hand):
             img = pg.image.load("images/{}/{}.jpg".format(j.deck, j.id)).convert()
