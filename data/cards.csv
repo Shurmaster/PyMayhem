@@ -3,7 +3,7 @@ quantity,id,deck,armor,draw,damage,extra_turn,heal,power_1,power_2,power_3
 4,more-justice,red,0,0,2,0,0,FALSE,FALSE,FALSE
 2,more-justice-2,red,0,0,3,0,0,FALSE,FALSE,FALSE
 3,fighting-words,red,0,0,2,0,1,FALSE,FALSE,FALSE
-3,divine-smith,red,0,0,3,0,1,FALSE,FALSE,FALSE
+3,divine-smite,red,0,0,3,0,1,FALSE,FALSE,FALSE
 2,finger-wag-of-judgment,red,0,0,0,2,0,FALSE,FALSE,FALSE
 2,spinning-parry,red,1,1,0,0,0,FALSE,FALSE,FALSE
 1,flurry,red,2,0,0,0,0,FALSE,FALSE,FALSE
@@ -29,7 +29,7 @@ quantity,id,deck,armor,draw,damage,extra_turn,heal,power_1,power_2,power_3
 3,magic-missile,yellow,0,0,1,1,0,FALSE,FALSE,FALSE
 3,burning-hands,yellow,0,0,2,0,0,FALSE,FALSE,FALSE
 4,lightning-bolt,yellow,0,0,3,0,0,FALSE,FALSE,FALSE
-2,shield,yellow,1,0,0,0,1,FALSE,FALSE,FALSE
+2,shield,yellow,1,1,0,0,0,FALSE,FALSE,FALSE
 1,stoneskin,yellow,2,0,0,0,0,FALSE,FALSE,FALSE
 1,mirror-image,yellow,3,0,0,0,0,FALSE,FALSE,FALSE
 1,knowledge-is-power,yellow,0,3,0,0,0,FALSE,FALSE,FALSE

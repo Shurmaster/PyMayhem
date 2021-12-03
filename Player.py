@@ -60,7 +60,14 @@ class Player(ABC):
         if self.active_card.draw:
             if len(self.deck.cards) < self.active_card.draw:
                 self.reload_deck()
-            self.hand += self.deck.draw(self.active_card.draw)
+            print(f"Hand: {self.hand}\nDeck:{self.deck}")
+            if self.active_card.draw == 1:
+                self.hand.append(self.deck.draw(self.active_card.draw))
+            else:
+                self.hand.extend(self.deck.draw(self.active_card.draw))
+            #self.hand += self.deck.draw(self.active_card.draw)
+
+            #self.hand += self.deck.draw()
             print(f"- Drew {self.active_card.draw} card{'s' if self.active_card.draw > 1 else ''}!")
             return f"- Drew {self.active_card.draw} card{'s' if self.active_card.draw > 1 else ''}!"
 
@@ -96,7 +103,7 @@ class Player(ABC):
                     strings.append(f"- Dealt {damage_dealt} damage to the opponent's shield!")
                     opponent.shield[0] -= dmg
                     dmg -= damage_dealt
-                    if opponent.shield[0] == 0:
+                    if opponent.shield[0] <= 0:
                         opponent.shield.pop()
                         print("The shield broke!", end='')
                         strings.append("The shield broke!")
@@ -196,7 +203,9 @@ class RedPlayer(Player):
     def mighty_power_1(self, opponent):
         """Choose any card from your graveyard and place it in your hand."""
         if not self.active_card.power_1:
-            return
+            return []
+        if len(self.graveyard) == 0:
+            return ["- No cards in GY!"]
         prompt = f"- {self.name}, which card will you choose from the graveyard?"
         for i, card in enumerate(self.graveyard):
             prompt += f"\n{i + 1}: {card}"
@@ -206,21 +215,22 @@ class RedPlayer(Player):
         card = self.graveyard.pop(int(choice) - 1)
         self.hand.append(card)
         print(f"- {card.name} was added to your hand!")
-
+        return [f"- {card.name} was added to your hand!"]
     def mighty_power_2(self, opponent):
         """Destroy all shields on both sides."""
         if not self.active_card.power_2:
-            return
+            return []
         for player in [self, opponent]:
             if player.disguised:
                 print(f"- {opponent.name} was disguised and couldn't be affected!")
+                return [f"- {opponent.name} was disguised and couldn't be affected!"]
             else:
                 player.shield.clear()
                 print(f"- All of {player.name}'s shields were destroyed!")
-
+                return [f"- All of {player.name}'s shields were destroyed!"]
     def mighty_power_3(self, opponent):
         """Red player has no third mighty power."""
-        pass
+        return [] 
 
 class YellowPlayer(Player):
     def __init__(self, name):
