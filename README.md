@@ -1,9 +1,9 @@
 # PyMayhem
 
 ## Description
-PyMayhem is a digital version of the tabletop card game "Dungeon Mayhem."
-It's implemented using Python 3, and the PyGame and SQLite/SQLAlchemy libraries.
-The game is restricted to two-player only, and requiring the two players
+PyMayhem is a digital version of the tabletop card game "Dungeon Mayhem." \
+It's implemented using Python 3, and the PyGame and SQLite/SQLAlchemy libraries. \
+The game is restricted to two-player only, and requiring the two players \
 to share the same device they play on.
 
 ## Requirements
@@ -18,11 +18,11 @@ to share the same device they play on.
 5. Play the game in the Window that opens. Controls and instructions for how to play are included in-gameState
 
 ## Developers
-Aldo: https://github.com/Shurmaster
-Skylar: https://github.com/skylar32
-Finley: https://github.com/finley-talley
-Emily: https://github.com/Aavacado
-Kajoyrie: https://github.com/GitKj
+Aldo: https://github.com/Shurmaster \
+Skylar: https://github.com/skylar32 \
+Finley: https://github.com/finley-talley \
+Emily: https://github.com/Aavacado \
+Kajoyrie: https://github.com/GitKj \
 
 ## Class
 COP4521 Fall 2021 Alan Kuhnle
