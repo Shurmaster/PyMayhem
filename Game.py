@@ -393,7 +393,10 @@ class Game:
             for j in range(0, self.defender.shield[i]):
                 img = pg.image.load("images/shield_d.png").convert_alpha()
                 rect = img.get_rect()
-                rect.topleft = (150+(150*i)+(22*j), 145)
+                if i == int(self.selectedShield[0])-1:
+                    rect.topleft = (150+(150*i)+(22*j), 160)
+                else:
+                    rect.topleft = (150+(150*i)+(22*j), 145)
                 self.screen.blit(img, rect)
 
         # attacker hand
