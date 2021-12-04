@@ -4,13 +4,13 @@
 PyMayhem is a digital version of the tabletop card game "Dungeon Mayhem." \
 It's implemented using Python 3, and the PyGame and SQLite libraries. \
 https://www.pygame.org/news \
-https://docs.python.org/3/library/sqlite3.html \
+https://docs.python.org/3/library/sqlite3.html
 
 The game is restricted to two-player only, and requiring the two players \
 to share the same device they play on.
 
 Card data is stored in a database and accessed by the game. The other features \
-are object oriented, relying
+are object oriented, relying on classes to build the game.
 
 ## Course
 COP4521 Fall 2021 Alan Kuhnle
