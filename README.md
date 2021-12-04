@@ -18,10 +18,10 @@ to share the same device they play on.
 5. Play the game in the Window that opens. Controls and instructions for how to play are included in-gameState
 
 ## Developers
-Aldo: https://github.com/Shurmaster\
-Skylar: https://github.com/skylar32\
-Finley: https://github.com/finley-talley\
-Emily: https://github.com/Aavacado\
+Aldo: https://github.com/Shurmaster \
+Skylar: https://github.com/skylar32 \
+Finley: https://github.com/finley-talley \
+Emily: https://github.com/Aavacado \
 Kajoyrie: https://github.com/GitKj
 
 ## Class
