@@ -469,28 +469,26 @@ class Game:
                 self.screen.blit(img, rect)
 
 
+        # attacker hand
+        for i, j in enumerate(self.attacker.hand):
+            img = pg.image.load(j.get_image_path()).convert()
+            rect = img.get_rect()
+            rect.topleft = (100+(170*i),350)
+
+            self.screen.blit(img, rect)
+
+
+        # drawing attacker hand and shield shield
         if self.attacker.turns == 0:
             for i, j in enumerate(self.attacker.hand):
-                pg.draw.rect(self.screen, [38, 46, 115], pg.Rect(100+(170*i), 350, 150, 249))
+                pg.draw.rect(self.screen, [32, 40, 69], pg.Rect(100+(170*i), 350, 150, 249))
         else:
-            # attacker hand
+        # TODO: if card has shield, draw shield
             for i, j in enumerate(self.attacker.hand):
                 img = pg.image.load(j.get_image_path()).convert()
                 rect = img.get_rect()
                 rect.topleft = (100+(170*i),350)
-
                 self.screen.blit(img, rect)
-
-
-            # drawing attacker shield
-            for i in range(0, len(self.attacker.shield)):
-                for j in range(0, self.attacker.shield[i]):
-                    img = pg.image.load("images/shield_a.png").convert_alpha()
-                    rect = img.get_rect()
-                    rect.topleft = (100+(170*i)+(42*j), 315)
-                    self.screen.blit(img, rect)
-
-
 
 
         # display actions of the card playeds
