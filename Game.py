@@ -95,18 +95,6 @@ class Game:
 
         screen.blit(message, pos)
 
-    # randomize a deck for each player
-    def random_player_color(playerStr):
-        #current decks: Red, Yellow, Green
-        #arbitrarily: Red=1, Yellow=2, Green=3
-        rand = random.randint(1,3)
-        if rand == 1:
-            return RedPlayer(playerStr)
-        elif rand == 2:
-            return YellowPlayer(playerStr)
-        elif rand == 3:
-            return GreenPlayer(playerStr)
-            
     ###################################### START SCREEN HELPER FUNCTIONS ######################################
     def start_events(self):
         for event in pg.event.get():
@@ -637,6 +625,17 @@ class Game:
         self.draw_text("You can close the game now.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.65], 28, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
+# randomize a deck for each player
+def random_player_color(playerStr):
+    #current decks: Red, Yellow, Green
+    #arbitrarily: Red=1, Yellow=2, Green=3
+    rand = random.randint(1,3)
+    if rand == 1:
+        return RedPlayer(playerStr)
+    elif rand == 2:
+        return YellowPlayer(playerStr)
+    elif rand == 3:
+        return GreenPlayer(playerStr)
 
 
 ######################################## MAIN ##############################################
