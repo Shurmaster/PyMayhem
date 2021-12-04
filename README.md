@@ -14,7 +14,7 @@ Card data is stored in a database and accessed by the game. The other features
 are object oriented, relying on classes to build the game.
 
 ## Course
-COP4521 Fall 2021 Alan Kuhnle
+COP4521 Fall 2021 Alan Kuhnle  
 Florida State University
 
 ## Requirements
