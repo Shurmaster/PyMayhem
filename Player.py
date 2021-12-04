@@ -186,7 +186,7 @@ class RedPlayer(Player):
 
     def mighty_power_3(self, opponent):
         """Red player has no third mighty power."""
-        pass
+        return [f"- uwu"]
 
 class YellowPlayer(Player):
     def __init__(self, name):
@@ -319,4 +319,18 @@ class PurplePlayer(Player):
 
     def mighty_power_3(self, opponent):
         """Take the top card of the opponent's deck and play it."""
-        ...
+        if not self.active_card.power_2:
+            return
+        if opponent.disguised:
+            print(f"- {opponent.name} was disguised and couldn't be affected!")
+            return
+        if len(opponent.hand) >= 2:
+            for i in range(2):
+                myrand = rand.randint(0, len(opponent.hand))
+                opponent.graveyard.append(opponent.hand.pop(myrand))
+        else:
+            opponent.graveyard.append(opponent.hand.pop(0))
+
+        return [
+            f"You made {opponent.name} discard {'2 cards from his' if len(opponent.hand) > 0 else 'their entire'} hand and gained an extra action."
+            ]
