@@ -154,40 +154,6 @@ class Player(ABC):
 
         return [value for value in strings if value != None]
 
-    def take_turn(self, *, opponent):
-        self.turns = 1
-        if self.disguised:
-            self.disguised = False
-        while self.turns > 0:
-            print(repr(self))
-            # top up deck
-            if len(self.hand) == 0:
-                self.hand = self.deck.draw(2)
-
-            # choose card
-            prompt =  "Which card will you play?"
-            for i, card in enumerate(self.hand):
-                prompt += f"\n{i + 1}: {card}"
-            prompt += "\n> "
-            while (choice := input(prompt)) not in [str(i + 1) for i in range(len(self.hand))]:
-                print("Invalid choice, try again.\n")
-            self.active_card = self.hand.pop(int(choice) - 1)
-            print(f"{self.name} played {self.active_card.name}!")
-
-            # take card actions
-            self.heal()
-            self.apply_shield()
-            self.extra_turns()
-            self.draw()
-            self.attack(opponent)
-            self.mighty_power_1(opponent)
-            self.mighty_power_2(opponent)
-            self.mighty_power_3(opponent)
-            self.turns -= 1
-            self.graveyard.append(self.active_card)
-            self.active_card = None
-            print('-' * 20)
-
     def __str__(self):
         return f"{self.name} ( {self.color} deck)"
 
@@ -234,7 +200,7 @@ class RedPlayer(Player):
                 return [f"- All of {player.name}'s shields were destroyed!"]
     def mighty_power_3(self, opponent, shield_choice):
         """Red player has no third mighty power."""
-        return [f"- uwu"] 
+        return [f"- uwu"]
 
 class YellowPlayer(Player):
     def __init__(self, name):
@@ -382,17 +348,5 @@ class PurplePlayer(Player):
             opponent.graveyard.append(opponent.hand.pop(0))
 
         return [
-            f"You made {opponent.name} discard {'2 cards from his' if len(opponent.hand) > 0 else 'their entire'} hand and gained an extra action."           
+            f"You made {opponent.name} discard {'2 cards from his' if len(opponent.hand) > 0 else 'their entire'} hand and gained an extra action."
             ]
-
-
-if __name__ == "__main__":
-    players = [YellowPlayer("skylar"), RedPlayer("test dummy")]
-    for card in players[0].deck.cards:
-        print(card.power_1)
-    turn = 0
-    while all([player.hp > 0 for player in players]):
-        attacker = players[turn % 2]
-        defender = players[(turn + 1) % 2]
-        attacker.take_turn(opponent=defender)
-        turn += 1
