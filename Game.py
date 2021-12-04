@@ -5,13 +5,12 @@ import random
 from Card import *
 from Player import *
 
+# initializations
 pg.init()
 
 bg = pg.image.load("images/start_saver_1200x600.jpg")
 help_screen = pg.image.load("images/help_screen.png")
-# images = load_images("images")
 
-## Can have a separate file for globals if we want
 SCREENWIDTH = 1200
 SCREENHEIGHT = 600
 
@@ -36,7 +35,7 @@ class Game:
         self.attacker = self.P1 # switch attacker/defender during hotseat
         self.defender = self.P2
         self.action_strings = []
-        self.msg_cooldown = 3000
+        self.msg_cooldown = 2000
         self.msg_time_total = 0
         self.last = pg.time.get_ticks()
         self.ctr = 0
@@ -44,10 +43,6 @@ class Game:
     # starting up the screen
     def start(self):
         self.setup() # run setup only once
-
-        #DEBUG STUFF
-        # for card in self.players[1].deck.cards:
-        #     print(repr(card))
 
         while self.gameRunning:
             if self.gameState == 'start':
@@ -100,7 +95,18 @@ class Game:
 
         screen.blit(message, pos)
 
-
+    # randomize a deck for each player
+    def random_player_color(playerStr):
+        #current decks: Red, Yellow, Green
+        #arbitrarily: Red=1, Yellow=2, Green=3
+        rand = random.randint(1,3)
+        if rand == 1:
+            return RedPlayer(playerStr)
+        elif rand == 2:
+            return YellowPlayer(playerStr)
+        elif rand == 3:
+            return GreenPlayer(playerStr)
+            
     ###################################### START SCREEN HELPER FUNCTIONS ######################################
     def start_events(self):
         for event in pg.event.get():
@@ -214,11 +220,14 @@ class Game:
                 self.defender = self.players[(self.turn + 1) % 2]
 
                 active_card = self.attacker.hand[int(self.selectedCard[0]) - 1]
+
                 if len(self.defender.shield) > 1 and (active_card.damage > 0 or active_card.requires_shield_select):
                     # if there are shields, you need to select a shield now
                     self.gameState = 'select shield'
+
                 elif (active_card.deck == "red" and active_card.power_1) and len(self.attacker.graveyard) > 0:
                     self.gameState = 'select gy'
+
                 else:
                     print("Its not either of the if statements")
                     print(f"ID: {active_card.deck} P1: {active_card.power_1} P2: {active_card.power_2} P3: {active_card.power_3}")
@@ -516,7 +525,6 @@ class Game:
                 self.draw_text(f"{self.action_strings[self.ctr]}", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.8], 24, pg.Color("black"), pg.font.get_default_font(), True)
 
 
-        #self.draw_text("You selected card {}".format(self.selectedCard[0]), self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         self.draw_text("Now your turn is over, executing actions.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 24, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
@@ -581,9 +589,6 @@ class Game:
         pg.draw.rect(self.screen, "gray", pg.Rect(60, 60, 1080, 480))
         pg.draw.rect(self.screen, "yellow", pg.Rect(450, 130, 315, 350))
 
-        #SCREENWIDTH = 1200
-        #SCREENHEIGHT = 600
-
 
         self.draw_text(f"Select Card in GY:", self.screen, [int(SCREENWIDTH * 0.45), int(SCREENHEIGHT * 0.25)], 24, pg.Color("Black"), pg.font.get_default_font(), False)
         self.draw_text(f"GY: {self.selectedGY + 1}/{len(self.attacker.graveyard)}", self.screen, [int(SCREENWIDTH * 0.49), int(SCREENHEIGHT * 0.75)], 24, pg.Color("Black"), pg.font.get_default_font(), False)
@@ -629,19 +634,10 @@ class Game:
             winner = self.defender
 
         self.draw_text(f'{winner} has won the game!', self.screen, [SCREENWIDTH//2, SCREENHEIGHT//2], 28, pg.Color("red"), pg.font.get_default_font(), True)
-        self.draw_text("You can close the game now", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.65], 28, pg.Color("red"), pg.font.get_default_font(), True)
+        self.draw_text("You can close the game now.", self.screen, [SCREENWIDTH//2, SCREENHEIGHT//1.65], 28, pg.Color("red"), pg.font.get_default_font(), True)
         pg.display.update()
 
-def random_player_color(playerStr):
-    #current decks: Red, Yellow, Green
-    #arbitrarily: Red=1, Yellow=2, Green=3
-    rand = random.randint(1,3)
-    if rand == 1:
-        return RedPlayer(playerStr)
-    elif rand == 2:
-        return YellowPlayer(playerStr)
-    elif rand == 3:
-        return GreenPlayer(playerStr)
+
 
 ######################################## MAIN ##############################################
 if __name__ == "__main__":
