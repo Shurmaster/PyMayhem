@@ -22,8 +22,8 @@ Aldo: https://github.com/Shurmaster \
 Skylar: https://github.com/skylar32 \
 Finley: https://github.com/finley-talley \
 Emily: https://github.com/Aavacado \
-Kajoyrie: https://github.com/GitKj
+Kajoyrie: https://github.com/GitKj \
 
 ## Class
-COP4521 Fall 2021 Alan Kuhnle\
+COP4521 Fall 2021 Alan Kuhnle
 Florida State University

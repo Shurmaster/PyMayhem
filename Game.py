@@ -636,6 +636,7 @@ def random_player_color(playerStr):
         return GreenPlayer(playerStr)
 
 
+
 ######################################## MAIN ##############################################
 if __name__ == "__main__":
     game = Game()
