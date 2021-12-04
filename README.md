@@ -40,7 +40,7 @@ Originally, our delegation of work was as follows:
 - Skylar: Databases, game logic
 - Finley: GUI
 - Emily: GUI
-- Kajoyrie: Game logic
+- Kajoyrie: Game logic  
 But as time passed, work on certain features had a lot of crossover, so everyone
 worked on a little bit of everything.
 
